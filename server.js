@@ -6,6 +6,8 @@ require('dotenv').config();
 
 const stockService = require('./services/stockService');
 const aiService = require('./services/aiService');
+const fundamentalsService = require('./services/fundamentalsService');
+const newsService = require('./services/newsService');
 
 const app = express();
 const PORT = process.env.PORT || 3000;
@@ -79,6 +81,131 @@ app.post('/api/refresh-summary', async (req, res) => {
     } catch (error) {
         console.error('Error refreshing summary:', error);
         res.status(500).json({ error: 'Failed to refresh summary' });
+    }
+});
+
+// Company Fundamentals API Endpoints
+app.get('/api/fundamentals/:symbol', async (req, res) => {
+    try {
+        const { symbol } = req.params;
+        const data = await fundamentalsService.getCompanyFundamentals(symbol.toUpperCase());
+        res.json(data);
+    } catch (error) {
+        console.error('Error fetching company fundamentals:', error);
+        res.status(500).json({ error: 'Failed to fetch company fundamentals' });
+    }
+});
+
+app.get('/api/financial-statements/:symbol', async (req, res) => {
+    try {
+        const { symbol } = req.params;
+        const data = await fundamentalsService.getFinancialStatements(symbol.toUpperCase());
+        res.json(data);
+    } catch (error) {
+        console.error('Error fetching financial statements:', error);
+        res.status(500).json({ error: 'Failed to fetch financial statements' });
+    }
+});
+
+app.get('/api/financial-ratios/:symbol', async (req, res) => {
+    try {
+        const { symbol } = req.params;
+        const data = await fundamentalsService.getKeyFinancialRatios(symbol.toUpperCase());
+        res.json(data);
+    } catch (error) {
+        console.error('Error fetching financial ratios:', error);
+        res.status(500).json({ error: 'Failed to fetch financial ratios' });
+    }
+});
+
+app.get('/api/analyst-ratings/:symbol', async (req, res) => {
+    try {
+        const { symbol } = req.params;
+        const data = await fundamentalsService.getAnalystRatings(symbol.toUpperCase());
+        res.json(data);
+    } catch (error) {
+        console.error('Error fetching analyst ratings:', error);
+        res.status(500).json({ error: 'Failed to fetch analyst ratings' });
+    }
+});
+
+app.get('/api/executive-compensation/:symbol', async (req, res) => {
+    try {
+        const { symbol } = req.params;
+        const data = await fundamentalsService.getExecutiveCompensation(symbol.toUpperCase());
+        res.json(data);
+    } catch (error) {
+        console.error('Error fetching executive compensation:', error);
+        res.status(500).json({ error: 'Failed to fetch executive compensation' });
+    }
+});
+
+app.get('/api/insider-trading/:symbol', async (req, res) => {
+    try {
+        const { symbol } = req.params;
+        const data = await fundamentalsService.getInsiderTrading(symbol.toUpperCase());
+        res.json(data);
+    } catch (error) {
+        console.error('Error fetching insider trading data:', error);
+        res.status(500).json({ error: 'Failed to fetch insider trading data' });
+    }
+});
+
+app.get('/api/esg-scores/:symbol', async (req, res) => {
+    try {
+        const { symbol } = req.params;
+        const data = await fundamentalsService.getESGScores(symbol.toUpperCase());
+        res.json(data);
+    } catch (error) {
+        console.error('Error fetching ESG scores:', error);
+        res.status(500).json({ error: 'Failed to fetch ESG scores' });
+    }
+});
+
+app.get('/api/peer-comparison/:symbol', async (req, res) => {
+    try {
+        const { symbol } = req.params;
+        const data = await fundamentalsService.getPeerComparison(symbol.toUpperCase());
+        res.json(data);
+    } catch (error) {
+        console.error('Error fetching peer comparison:', error);
+        res.status(500).json({ error: 'Failed to fetch peer comparison' });
+    }
+});
+
+// News & Sentiment Analysis API Endpoints
+app.get('/api/market-news', async (req, res) => {
+    try {
+        const { limit = 20, category = 'general' } = req.query;
+        const data = await newsService.getMarketNews(parseInt(limit), category);
+        res.json(data);
+    } catch (error) {
+        console.error('Error fetching market news:', error);
+        res.status(500).json({ error: 'Failed to fetch market news' });
+    }
+});
+
+app.get('/api/company-news/:symbol', async (req, res) => {
+    try {
+        const { symbol } = req.params;
+        const { limit = 10 } = req.query;
+        const data = await newsService.getCompanyNews(symbol.toUpperCase(), parseInt(limit));
+        res.json(data);
+    } catch (error) {
+        console.error('Error fetching company news:', error);
+        res.status(500).json({ error: 'Failed to fetch company news' });
+    }
+});
+
+app.get('/api/sentiment-analysis/:symbol', async (req, res) => {
+    try {
+        const { symbol } = req.params;
+        const { timeframe = '7d' } = req.query;
+        const data = await newsService.getSentimentAnalysis(symbol.toUpperCase(), timeframe);
+        res.json(data);
+    } catch (error) {
+        console.error('Error fetching sentiment analysis:', error);
+        res.status(500).json({ error: 'Failed to fetch sentiment analysis' });
     }
 });
 

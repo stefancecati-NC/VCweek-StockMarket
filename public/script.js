@@ -8,6 +8,7 @@ class StockMarketApp {
     init() {
         this.bindEventListeners();
         this.loadInitialData();
+        this.bindNewEventListeners();
     }
 
     bindEventListeners() {
@@ -386,6 +387,756 @@ class StockMarketApp {
                 }
             }, 300);
         }, 3000);
+    }
+
+    // New Event Listeners for Fundamentals and News Features
+    bindNewEventListeners() {
+        // Company search
+        document.getElementById('searchCompanyBtn').addEventListener('click', () => {
+            this.searchCompany();
+        });
+
+        document.getElementById('companySearchInput').addEventListener('keypress', (e) => {
+            if (e.key === 'Enter') {
+                this.searchCompany();
+            }
+        });
+
+        // Fundamentals tabs
+        document.querySelectorAll('.company-fundamentals .tab-btn').forEach(btn => {
+            btn.addEventListener('click', (e) => {
+                this.switchFundamentalsTab(e.target.dataset.tab);
+            });
+        });
+
+        // News tabs
+        document.querySelectorAll('.news-sentiment .tab-btn').forEach(btn => {
+            btn.addEventListener('click', (e) => {
+                this.switchNewsTab(e.target.dataset.tab);
+            });
+        });
+
+        // News category filter
+        document.getElementById('newsCategory').addEventListener('change', () => {
+            this.loadMarketNews();
+        });
+
+        // Refresh news button
+        document.getElementById('refreshNewsBtn').addEventListener('click', () => {
+            this.loadMarketNews();
+        });
+
+        // Load initial market news
+        this.loadMarketNews();
+    }
+
+    async searchCompany() {
+        const symbol = document.getElementById('companySearchInput').value.trim().toUpperCase();
+        if (!symbol) {
+            this.showError('Please enter a stock symbol');
+            return;
+        }
+
+        this.showLoading(true);
+        try {
+            await this.loadCompanyFundamentals(symbol);
+            await this.loadCompanyNews(symbol);
+            await this.loadSentimentAnalysis(symbol);
+            
+            // Show the fundamentals section
+            document.getElementById('companyFundamentals').style.display = 'block';
+            
+            // Show company-specific news tabs
+            document.getElementById('companyNewsTab').style.display = 'block';
+            document.getElementById('sentimentTab').style.display = 'block';
+            
+            // Update tab labels with company symbol
+            document.getElementById('companyNewsTab').textContent = `${symbol} News`;
+            document.getElementById('sentimentTab').textContent = `${symbol} Sentiment`;
+            
+            // Scroll to fundamentals section
+            document.getElementById('companyFundamentals').scrollIntoView({ behavior: 'smooth' });
+            
+        } catch (error) {
+            this.showError(`Failed to load data for ${symbol}. Please try again.`);
+        } finally {
+            this.showLoading(false);
+        }
+    }
+
+    async loadCompanyFundamentals(symbol) {
+        try {
+            const data = await this.apiCall('GET', `/fundamentals/${symbol}`);
+            this.renderCompanyFundamentals(data);
+        } catch (error) {
+            console.error('Error loading company fundamentals:', error);
+        }
+    }
+
+    async loadCompanyNews(symbol) {
+        try {
+            const data = await this.apiCall('GET', `/company-news/${symbol}`);
+            this.renderCompanyNews(data);
+        } catch (error) {
+            console.error('Error loading company news:', error);
+        }
+    }
+
+    async loadSentimentAnalysis(symbol) {
+        try {
+            const data = await this.apiCall('GET', `/sentiment-analysis/${symbol}`);
+            this.renderSentimentAnalysis(data);
+        } catch (error) {
+            console.error('Error loading sentiment analysis:', error);
+        }
+    }
+
+    async loadMarketNews() {
+        try {
+            const category = document.getElementById('newsCategory').value;
+            const data = await this.apiCall('GET', `/market-news?category=${category}&limit=20`);
+            this.renderMarketNews(data);
+        } catch (error) {
+            console.error('Error loading market news:', error);
+        }
+    }
+
+    renderCompanyFundamentals(data) {
+        // Render company info
+        this.renderCompanyInfo(data.company, data.symbol);
+        
+        // Render overview tab (key metrics and peer comparison)
+        this.renderKeyMetrics(data.keyRatios, data.financialStatements);
+        this.renderPeerComparison(data.peerComparison);
+        
+        // Render financial statements
+        this.renderFinancialStatements(data.financialStatements);
+        
+        // Render ratios
+        this.renderFinancialRatios(data.keyRatios);
+        
+        // Render analyst data
+        this.renderAnalystRatings(data.analystRatings);
+        
+        // Render governance data
+        this.renderExecutiveCompensation(data.executiveComp);
+        this.renderInsiderTrading(data.insiderTrading);
+        
+        // Render ESG data
+        this.renderESGScores(data.esgScores);
+    }
+
+    renderCompanyInfo(company, symbol) {
+        const container = document.getElementById('companyInfo');
+        container.innerHTML = `
+            <div class="company-header">
+                <div class="company-title">
+                    <h3>${company.name || symbol}</h3>
+                    <span class="company-symbol">${symbol}</span>
+                </div>
+                <div class="company-details">
+                    <span><i class="fas fa-industry"></i> ${company.sector || 'N/A'}</span>
+                    <span><i class="fas fa-building"></i> ${company.industry || 'N/A'}</span>
+                    <span><i class="fas fa-users"></i> ${company.employees ? company.employees.toLocaleString() : 'N/A'} employees</span>
+                </div>
+            </div>
+        `;
+    }
+
+    renderKeyMetrics(ratios, financials) {
+        const container = document.getElementById('keyMetrics');
+        if (!ratios || !ratios.valuation) {
+            container.innerHTML = '<p>Key metrics data not available</p>';
+            return;
+        }
+
+        container.innerHTML = `
+            <div class="metrics-grid">
+                <div class="metric-item">
+                    <div class="metric-label">P/E Ratio</div>
+                    <div class="metric-value">${ratios.valuation.priceToEarnings?.toFixed(2) || 'N/A'}</div>
+                </div>
+                <div class="metric-item">
+                    <div class="metric-label">P/B Ratio</div>
+                    <div class="metric-value">${ratios.valuation.priceToBook?.toFixed(2) || 'N/A'}</div>
+                </div>
+                <div class="metric-item">
+                    <div class="metric-label">ROE</div>
+                    <div class="metric-value">${ratios.profitability?.returnOnEquity?.toFixed(2) || 'N/A'}%</div>
+                </div>
+                <div class="metric-item">
+                    <div class="metric-label">Net Margin</div>
+                    <div class="metric-value">${ratios.profitability?.netMargin?.toFixed(2) || 'N/A'}%</div>
+                </div>
+            </div>
+        `;
+    }
+
+    renderPeerComparison(peerData) {
+        const container = document.getElementById('peerComparison');
+        if (!peerData || !peerData.comparison) {
+            container.innerHTML = '<p>Peer comparison data not available</p>';
+            return;
+        }
+
+        const comparison = peerData.comparison;
+        container.innerHTML = `
+            <div class="peer-metrics">
+                <div class="peer-metric">
+                    <div class="metric-name">Market Cap Rank</div>
+                    <div class="metric-rank">#${comparison.marketCap?.rank || 'N/A'}</div>
+                </div>
+                <div class="peer-metric">
+                    <div class="metric-name">P/E Rank</div>
+                    <div class="metric-rank">#${comparison.peRatio?.rank || 'N/A'}</div>
+                </div>
+                <div class="peer-metric">
+                    <div class="metric-name">Revenue Rank</div>
+                    <div class="metric-rank">#${comparison.revenue?.rank || 'N/A'}</div>
+                </div>
+            </div>
+            <div class="peer-list">
+                <strong>Peers:</strong> ${peerData.peers?.join(', ') || 'N/A'}
+            </div>
+        `;
+    }
+
+    renderFinancialStatements(statements) {
+        if (!statements) return;
+
+        // Income Statement
+        this.renderIncomeStatement(statements.incomeStatement);
+        
+        // Balance Sheet
+        this.renderBalanceSheet(statements.balanceSheet);
+        
+        // Cash Flow
+        this.renderCashFlow(statements.cashFlow);
+    }
+
+    renderIncomeStatement(incomeStatement) {
+        const container = document.getElementById('incomeStatement');
+        if (!incomeStatement || !incomeStatement.annual) {
+            container.innerHTML = '<p>Income statement data not available</p>';
+            return;
+        }
+
+        const latest = incomeStatement.annual[0];
+        container.innerHTML = `
+            <div class="financial-items">
+                <div class="financial-item">
+                    <span>Revenue</span>
+                    <span>$${this.formatLargeNumber(latest.revenue)}</span>
+                </div>
+                <div class="financial-item">
+                    <span>Gross Profit</span>
+                    <span>$${this.formatLargeNumber(latest.grossProfit)}</span>
+                </div>
+                <div class="financial-item">
+                    <span>Operating Income</span>
+                    <span>$${this.formatLargeNumber(latest.operatingIncome)}</span>
+                </div>
+                <div class="financial-item">
+                    <span>Net Income</span>
+                    <span>$${this.formatLargeNumber(latest.netIncome)}</span>
+                </div>
+                <div class="financial-item">
+                    <span>EPS</span>
+                    <span>$${latest.eps?.toFixed(2) || 'N/A'}</span>
+                </div>
+            </div>
+        `;
+    }
+
+    renderBalanceSheet(balanceSheet) {
+        const container = document.getElementById('balanceSheet');
+        if (!balanceSheet) {
+            container.innerHTML = '<p>Balance sheet data not available</p>';
+            return;
+        }
+
+        container.innerHTML = `
+            <div class="financial-items">
+                <div class="financial-item">
+                    <span>Total Assets</span>
+                    <span>$${this.formatLargeNumber(balanceSheet.totalAssets)}</span>
+                </div>
+                <div class="financial-item">
+                    <span>Total Liabilities</span>
+                    <span>$${this.formatLargeNumber(balanceSheet.totalLiabilities)}</span>
+                </div>
+                <div class="financial-item">
+                    <span>Shareholders' Equity</span>
+                    <span>$${this.formatLargeNumber(balanceSheet.shareholdersEquity)}</span>
+                </div>
+                <div class="financial-item">
+                    <span>Cash</span>
+                    <span>$${this.formatLargeNumber(balanceSheet.cash)}</span>
+                </div>
+                <div class="financial-item">
+                    <span>Total Debt</span>
+                    <span>$${this.formatLargeNumber(balanceSheet.totalDebt)}</span>
+                </div>
+            </div>
+        `;
+    }
+
+    renderCashFlow(cashFlow) {
+        const container = document.getElementById('cashFlow');
+        if (!cashFlow) {
+            container.innerHTML = '<p>Cash flow data not available</p>';
+            return;
+        }
+
+        container.innerHTML = `
+            <div class="financial-items">
+                <div class="financial-item">
+                    <span>Operating Cash Flow</span>
+                    <span>$${this.formatLargeNumber(cashFlow.operatingCashFlow)}</span>
+                </div>
+                <div class="financial-item">
+                    <span>Investing Cash Flow</span>
+                    <span>$${this.formatLargeNumber(cashFlow.investingCashFlow)}</span>
+                </div>
+                <div class="financial-item">
+                    <span>Financing Cash Flow</span>
+                    <span>$${this.formatLargeNumber(cashFlow.financingCashFlow)}</span>
+                </div>
+                <div class="financial-item">
+                    <span>Free Cash Flow</span>
+                    <span>$${this.formatLargeNumber(cashFlow.freeCashFlow)}</span>
+                </div>
+                <div class="financial-item">
+                    <span>Capital Expenditures</span>
+                    <span>$${this.formatLargeNumber(cashFlow.capex)}</span>
+                </div>
+            </div>
+        `;
+    }
+
+    renderFinancialRatios(ratios) {
+        if (!ratios) return;
+
+        this.renderRatioCategory('profitabilityRatios', ratios.profitability, '%');
+        this.renderRatioCategory('liquidityRatios', ratios.liquidity, '');
+        this.renderRatioCategory('leverageRatios', ratios.leverage, '');
+        this.renderRatioCategory('valuationRatios', ratios.valuation, '');
+    }
+
+    renderRatioCategory(containerId, ratioData, suffix) {
+        const container = document.getElementById(containerId);
+        if (!ratioData) {
+            container.innerHTML = '<p>Data not available</p>';
+            return;
+        }
+
+        container.innerHTML = Object.entries(ratioData)
+            .map(([key, value]) => `
+                <div class="ratio-item">
+                    <span>${this.formatRatioName(key)}</span>
+                    <span>${typeof value === 'number' ? value.toFixed(2) + suffix : 'N/A'}</span>
+                </div>
+            `).join('');
+    }
+
+    renderAnalystRatings(ratings) {
+        if (!ratings) return;
+
+        // Render analyst ratings
+        const ratingsContainer = document.getElementById('analystRatings');
+        if (ratings.consensus) {
+            ratingsContainer.innerHTML = `
+                <div class="analyst-consensus">
+                    <div class="consensus-rating">
+                        <span class="rating-badge ${ratings.consensus.rating.toLowerCase()}">${ratings.consensus.rating}</span>
+                        <span class="rating-score">${ratings.consensus.score}/5</span>
+                    </div>
+                    <div class="analyst-count">${ratings.consensus.totalAnalysts} Analysts</div>
+                </div>
+                <div class="rating-breakdown">
+                    <div class="rating-bar">
+                        <span>Strong Buy</span>
+                        <div class="bar"><div class="fill" style="width: ${(ratings.ratings.strongBuy / ratings.consensus.totalAnalysts * 100)}%"></div></div>
+                        <span>${ratings.ratings.strongBuy}</span>
+                    </div>
+                    <div class="rating-bar">
+                        <span>Buy</span>
+                        <div class="bar"><div class="fill" style="width: ${(ratings.ratings.buy / ratings.consensus.totalAnalysts * 100)}%"></div></div>
+                        <span>${ratings.ratings.buy}</span>
+                    </div>
+                    <div class="rating-bar">
+                        <span>Hold</span>
+                        <div class="bar"><div class="fill" style="width: ${(ratings.ratings.hold / ratings.consensus.totalAnalysts * 100)}%"></div></div>
+                        <span>${ratings.ratings.hold}</span>
+                    </div>
+                </div>
+            `;
+        }
+
+        // Render price targets
+        const targetsContainer = document.getElementById('priceTargets');
+        if (ratings.priceTargets) {
+            const targets = ratings.priceTargets;
+            targetsContainer.innerHTML = `
+                <div class="price-targets">
+                    <div class="target-item">
+                        <span>Average Target</span>
+                        <span class="target-price">$${targets.average?.toFixed(2) || 'N/A'}</span>
+                    </div>
+                    <div class="target-range">
+                        <span>Range: $${targets.low?.toFixed(2) || 'N/A'} - $${targets.high?.toFixed(2) || 'N/A'}</span>
+                    </div>
+                    <div class="upside">
+                        <span class="${targets.upside > 0 ? 'positive' : 'negative'}">
+                            Upside: ${targets.upside?.toFixed(1) || 'N/A'}%
+                        </span>
+                    </div>
+                </div>
+            `;
+        }
+
+        // Render recent changes
+        const changesContainer = document.getElementById('recentChanges');
+        if (ratings.recentChanges) {
+            changesContainer.innerHTML = ratings.recentChanges.map(change => `
+                <div class="analyst-change">
+                    <div class="change-header">
+                        <strong>${change.analyst}</strong>
+                        <span class="change-date">${this.formatDate(change.date)}</span>
+                    </div>
+                    <div class="change-details">
+                        <span class="action ${change.action.toLowerCase()}">${change.action}</span>
+                        ${change.from ? `<span>${change.from} → ${change.to}</span>` : `<span>${change.rating}</span>`}
+                        <span class="price-target">$${change.priceTarget?.toFixed(2) || 'N/A'}</span>
+                    </div>
+                </div>
+            `).join('');
+        }
+    }
+
+    renderExecutiveCompensation(execComp) {
+        const container = document.getElementById('executiveComp');
+        if (!execComp || !execComp.ceo) {
+            container.innerHTML = '<p>Executive compensation data not available</p>';
+            return;
+        }
+
+        container.innerHTML = `
+            <div class="exec-comp">
+                <div class="ceo-comp">
+                    <h4>${execComp.ceo.name} (${execComp.ceo.title})</h4>
+                    <div class="comp-breakdown">
+                        <div class="comp-item">
+                            <span>Total Compensation</span>
+                            <span class="comp-value">$${this.formatLargeNumber(execComp.ceo.totalCompensation)}</span>
+                        </div>
+                        <div class="comp-item">
+                            <span>Base Salary</span>
+                            <span>$${this.formatLargeNumber(execComp.ceo.salary)}</span>
+                        </div>
+                        <div class="comp-item">
+                            <span>Stock Awards</span>
+                            <span>$${this.formatLargeNumber(execComp.ceo.stockAwards)}</span>
+                        </div>
+                    </div>
+                </div>
+                ${execComp.payRatio ? `
+                    <div class="pay-ratio">
+                        <span>CEO to Median Worker Pay Ratio</span>
+                        <span class="ratio-value">${execComp.payRatio.ceoToMedianWorker}:1</span>
+                    </div>
+                ` : ''}
+            </div>
+        `;
+    }
+
+    renderInsiderTrading(insiderData) {
+        const container = document.getElementById('insiderTrading');
+        if (!insiderData || !insiderData.recentTransactions) {
+            container.innerHTML = '<p>Insider trading data not available</p>';
+            return;
+        }
+
+        container.innerHTML = `
+            <div class="insider-summary">
+                <div class="summary-item">
+                    <span>3-Month Net</span>
+                    <span class="${insiderData.summary.last3Months.sentiment.toLowerCase()}">
+                        ${this.formatLargeNumber(insiderData.summary.last3Months.netValue)}
+                    </span>
+                </div>
+                <div class="summary-item">
+                    <span>Sentiment</span>
+                    <span class="${insiderData.summary.last3Months.sentiment.toLowerCase()}">
+                        ${insiderData.summary.last3Months.sentiment}
+                    </span>
+                </div>
+            </div>
+            <div class="insider-transactions">
+                ${insiderData.recentTransactions.slice(0, 5).map(transaction => `
+                    <div class="transaction-item">
+                        <div class="transaction-header">
+                            <strong>${transaction.insider}</strong>
+                            <span class="transaction-type ${transaction.transactionType.toLowerCase()}">${transaction.transactionType}</span>
+                        </div>
+                        <div class="transaction-details">
+                            <span>${transaction.shares.toLocaleString()} shares @ $${transaction.pricePerShare}</span>
+                            <span class="total-value">$${this.formatLargeNumber(transaction.totalValue)}</span>
+                            <span class="transaction-date">${this.formatDate(transaction.date)}</span>
+                        </div>
+                    </div>
+                `).join('')}
+            </div>
+        `;
+    }
+
+    renderESGScores(esgData) {
+        if (!esgData) return;
+
+        // ESG Overview
+        const overviewContainer = document.getElementById('esgOverview');
+        overviewContainer.innerHTML = `
+            <div class="esg-score-card">
+                <div class="overall-score">
+                    <div class="score-circle">
+                        <span class="score-number">${esgData.overallScore || 0}</span>
+                        <span class="score-grade">${esgData.grade || 'N/A'}</span>
+                    </div>
+                </div>
+                <div class="esg-details">
+                    <div class="detail-item">
+                        <span>Industry Rank</span>
+                        <span>#${esgData.peerRank || 'N/A'}</span>
+                    </div>
+                    <div class="detail-item">
+                        <span>Risk Level</span>
+                        <span class="risk-${(esgData.riskLevel || 'unknown').toLowerCase()}">${esgData.riskLevel || 'N/A'}</span>
+                    </div>
+                    <div class="detail-item">
+                        <span>vs Industry Avg</span>
+                        <span>${esgData.industryAverage || 'N/A'}</span>
+                    </div>
+                </div>
+            </div>
+        `;
+
+        // ESG Breakdown
+        const breakdownContainer = document.getElementById('esgBreakdown');
+        if (esgData.environmental && esgData.social && esgData.governance) {
+            breakdownContainer.innerHTML = `
+                <div class="esg-categories">
+                    <div class="esg-category">
+                        <h4><i class="fas fa-leaf"></i> Environmental</h4>
+                        <div class="category-score">${esgData.environmental.score} (${esgData.environmental.grade})</div>
+                        <div class="score-bar">
+                            <div class="score-fill" style="width: ${esgData.environmental.score}%"></div>
+                        </div>
+                    </div>
+                    <div class="esg-category">
+                        <h4><i class="fas fa-users"></i> Social</h4>
+                        <div class="category-score">${esgData.social.score} (${esgData.social.grade})</div>
+                        <div class="score-bar">
+                            <div class="score-fill" style="width: ${esgData.social.score}%"></div>
+                        </div>
+                    </div>
+                    <div class="esg-category">
+                        <h4><i class="fas fa-gavel"></i> Governance</h4>
+                        <div class="category-score">${esgData.governance.score} (${esgData.governance.grade})</div>
+                        <div class="score-bar">
+                            <div class="score-fill" style="width: ${esgData.governance.score}%"></div>
+                        </div>
+                    </div>
+                </div>
+            `;
+        }
+    }
+
+    renderMarketNews(newsData) {
+        // Render news summary
+        const summaryContainer = document.getElementById('newsSummary');
+        if (newsData.summary) {
+            summaryContainer.innerHTML = `
+                <div class="news-stats">
+                    <div class="stat-item">
+                        <span class="stat-number">${newsData.summary.totalArticles}</span>
+                        <span class="stat-label">Articles</span>
+                    </div>
+                    <div class="stat-item">
+                        <span class="stat-number positive">${newsData.summary.sentimentBreakdown.positive}</span>
+                        <span class="stat-label">Positive</span>
+                    </div>
+                    <div class="stat-item">
+                        <span class="stat-number negative">${newsData.summary.sentimentBreakdown.negative}</span>
+                        <span class="stat-label">Negative</span>
+                    </div>
+                </div>
+                <div class="overall-sentiment">
+                    <span class="sentiment-badge ${newsData.sentimentAnalysis.label}">
+                        Overall: ${newsData.sentimentAnalysis.label}
+                    </span>
+                </div>
+            `;
+        }
+
+        // Render news articles
+        const newsContainer = document.getElementById('marketNewsList');
+        if (newsData.articles && newsData.articles.length > 0) {
+            newsContainer.innerHTML = newsData.articles.map(article => this.createNewsArticle(article)).join('');
+        } else {
+            newsContainer.innerHTML = '<p>No news articles available</p>';
+        }
+    }
+
+    renderCompanyNews(newsData) {
+        const headerContainer = document.getElementById('companyNewsHeader');
+        headerContainer.innerHTML = `
+            <div class="company-news-stats">
+                <div class="news-impact">
+                    <span>Impact Score</span>
+                    <span class="impact-score">${(newsData.impactScore * 100).toFixed(0) || 0}%</span>
+                </div>
+                <div class="news-sentiment">
+                    <span>Sentiment</span>
+                    <span class="sentiment-badge ${newsData.sentimentAnalysis?.label || 'neutral'}">
+                        ${newsData.sentimentAnalysis?.label || 'Neutral'}
+                    </span>
+                </div>
+            </div>
+        `;
+
+        const newsContainer = document.getElementById('companyNewsList');
+        if (newsData.articles && newsData.articles.length > 0) {
+            newsContainer.innerHTML = newsData.articles.map(article => this.createNewsArticle(article)).join('');
+        } else {
+            newsContainer.innerHTML = '<p>No company news available</p>';
+        }
+    }
+
+    renderSentimentAnalysis(sentimentData) {
+        // Overview
+        const overviewContainer = document.getElementById('sentimentOverview');
+        if (sentimentData.overall) {
+            overviewContainer.innerHTML = `
+                <div class="sentiment-score-card">
+                    <div class="overall-sentiment-score">
+                        <div class="score-circle">
+                            <span class="score-number">${(sentimentData.overall.score * 100).toFixed(0)}</span>
+                            <span class="score-direction ${sentimentData.overall.direction}">${sentimentData.overall.direction}</span>
+                        </div>
+                    </div>
+                    <div class="sentiment-details">
+                        <div class="detail-item">
+                            <span>Confidence</span>
+                            <span>${(sentimentData.overall.confidence * 100).toFixed(0)}%</span>
+                        </div>
+                        <div class="detail-item">
+                            <span>Change</span>
+                            <span class="${sentimentData.overall.change.startsWith('+') ? 'positive' : 'negative'}">
+                                ${sentimentData.overall.change}
+                            </span>
+                        </div>
+                    </div>
+                </div>
+            `;
+        }
+
+        // Breakdown
+        const breakdownContainer = document.getElementById('sentimentBreakdown');
+        if (sentimentData.breakdown) {
+            breakdownContainer.innerHTML = `
+                <div class="sentiment-sources">
+                    <div class="source-item">
+                        <h4><i class="fas fa-newspaper"></i> News</h4>
+                        <div class="source-score">${(sentimentData.breakdown.news.score * 100).toFixed(0)}</div>
+                        <div class="source-details">${sentimentData.breakdown.news.articles} articles</div>
+                    </div>
+                    <div class="source-item">
+                        <h4><i class="fas fa-comments"></i> Social</h4>
+                        <div class="source-score">${(sentimentData.breakdown.social.score * 100).toFixed(0)}</div>
+                        <div class="source-details">${sentimentData.breakdown.social.mentions} mentions</div>
+                    </div>
+                    <div class="source-item">
+                        <h4><i class="fas fa-user-tie"></i> Analyst</h4>
+                        <div class="source-score">${(sentimentData.breakdown.analyst.score * 100).toFixed(0)}</div>
+                        <div class="source-details">${sentimentData.breakdown.analyst.upgrades} upgrades</div>
+                    </div>
+                </div>
+            `;
+        }
+
+        // Trends
+        const trendsContainer = document.getElementById('sentimentTrends');
+        if (sentimentData.trends && sentimentData.trends.daily) {
+            trendsContainer.innerHTML = `
+                <div class="trend-chart">
+                    <h4>7-Day Sentiment Trend</h4>
+                    <div class="trend-bars">
+                        ${sentimentData.trends.daily.map(point => `
+                            <div class="trend-bar">
+                                <div class="bar-fill" style="height: ${point.score * 100}%"></div>
+                                <div class="bar-label">${point.period.split('-')[2]}</div>
+                            </div>
+                        `).join('')}
+                    </div>
+                </div>
+            `;
+        }
+    }
+
+    createNewsArticle(article) {
+        return `
+            <div class="news-article">
+                <div class="article-header">
+                    <h4 class="article-title">${article.title}</h4>
+                    <div class="article-meta">
+                        <span class="article-source">${article.source}</span>
+                        <span class="article-time">${article.publishedAgo || this.getTimeAgo(article.publishedAt)}</span>
+                        ${article.sentiment ? `
+                            <span class="sentiment-badge ${article.sentiment.label}">${article.sentiment.label}</span>
+                        ` : ''}
+                    </div>
+                </div>
+                <p class="article-description">${article.description}</p>
+                ${article.keywords && article.keywords.length > 0 ? `
+                    <div class="article-keywords">
+                        ${article.keywords.map(keyword => `<span class="keyword-tag">${keyword}</span>`).join('')}
+                    </div>
+                ` : ''}
+            </div>
+        `;
+    }
+
+    switchFundamentalsTab(tabName) {
+        // Remove active class from all tabs and content
+        document.querySelectorAll('.company-fundamentals .tab-btn').forEach(btn => btn.classList.remove('active'));
+        document.querySelectorAll('.company-fundamentals .tab-content').forEach(content => content.classList.remove('active'));
+        
+        // Add active class to selected tab and content
+        document.querySelector(`[data-tab="${tabName}"]`).classList.add('active');
+        document.getElementById(`${tabName}-tab`).classList.add('active');
+    }
+
+    switchNewsTab(tabName) {
+        // Remove active class from all tabs and content
+        document.querySelectorAll('.news-sentiment .tab-btn').forEach(btn => btn.classList.remove('active'));
+        document.querySelectorAll('.news-sentiment .tab-content').forEach(content => content.classList.remove('active'));
+        
+        // Add active class to selected tab and content
+        document.querySelector(`[data-tab="${tabName}"]`).classList.add('active');
+        document.getElementById(`${tabName}-tab`).classList.add('active');
+    }
+
+    formatLargeNumber(num) {
+        if (num === null || num === undefined) return 'N/A';
+        if (num >= 1e12) return (num / 1e12).toFixed(2) + 'T';
+        if (num >= 1e9) return (num / 1e9).toFixed(2) + 'B';
+        if (num >= 1e6) return (num / 1e6).toFixed(2) + 'M';
+        if (num >= 1e3) return (num / 1e3).toFixed(2) + 'K';
+        return num.toFixed(2);
+    }
+
+    formatRatioName(camelCase) {
+        return camelCase.replace(/([A-Z])/g, ' $1').replace(/^./, str => str.toUpperCase());
     }
 }
 
