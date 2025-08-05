@@ -8,6 +8,7 @@ const stockService = require('./services/stockService');
 const aiService = require('./services/aiService');
 const fundamentalsService = require('./services/fundamentalsService');
 const newsService = require('./services/newsService');
+const investmentSimulator = require('./services/investmentSimulator');
 
 const app = express();
 const PORT = process.env.PORT || 3000;
@@ -206,6 +207,88 @@ app.get('/api/sentiment-analysis/:symbol', async (req, res) => {
     } catch (error) {
         console.error('Error fetching sentiment analysis:', error);
         res.status(500).json({ error: 'Failed to fetch sentiment analysis' });
+    }
+});
+
+// Investment Simulation API Endpoints
+app.post('/api/simulate-future-investment', async (req, res) => {
+    try {
+        const { amount, symbol, days, confidenceLevel = 0.68 } = req.body;
+        
+        if (!amount || !symbol || !days) {
+            return res.status(400).json({ error: 'Missing required parameters: amount, symbol, days' });
+        }
+        
+        const data = investmentSimulator.simulateFutureInvestment(
+            parseFloat(amount), 
+            symbol.toUpperCase(), 
+            parseInt(days), 
+            parseFloat(confidenceLevel)
+        );
+        res.json(data);
+    } catch (error) {
+        console.error('Error simulating future investment:', error);
+        res.status(500).json({ error: 'Failed to simulate future investment' });
+    }
+});
+
+app.post('/api/simulate-historical-whatif', async (req, res) => {
+    try {
+        const { amount, symbol, daysAgo } = req.body;
+        
+        if (!amount || !symbol || !daysAgo) {
+            return res.status(400).json({ error: 'Missing required parameters: amount, symbol, daysAgo' });
+        }
+        
+        const data = await investmentSimulator.calculateHistoricalWhatIf(
+            parseFloat(amount), 
+            symbol.toUpperCase(), 
+            parseInt(daysAgo)
+        );
+        res.json(data);
+    } catch (error) {
+        console.error('Error calculating historical what-if:', error);
+        res.status(500).json({ error: 'Failed to calculate historical what-if' });
+    }
+});
+
+app.post('/api/simulate-portfolio', async (req, res) => {
+    try {
+        const { portfolio, totalAmount, days } = req.body;
+        
+        if (!portfolio || !totalAmount || !days) {
+            return res.status(400).json({ error: 'Missing required parameters: portfolio, totalAmount, days' });
+        }
+        
+        // Validate portfolio allocations sum to 100
+        const totalAllocation = Object.values(portfolio).reduce((sum, allocation) => sum + allocation, 0);
+        if (Math.abs(totalAllocation - 100) > 0.01) {
+            return res.status(400).json({ error: 'Portfolio allocations must sum to 100%' });
+        }
+        
+        const data = investmentSimulator.simulatePortfolioInvestment(
+            portfolio, 
+            parseFloat(totalAmount), 
+            parseInt(days)
+        );
+        res.json(data);
+    } catch (error) {
+        console.error('Error simulating portfolio investment:', error);
+        res.status(500).json({ error: 'Failed to simulate portfolio investment' });
+    }
+});
+
+app.get('/api/investment-profiles', (req, res) => {
+    try {
+        const profiles = {
+            stocks: Object.keys(investmentSimulator.stockProfiles),
+            portfolioTypes: Object.keys(investmentSimulator.volatilityProfiles),
+            marketData: investmentSimulator.getMockMarketData()
+        };
+        res.json(profiles);
+    } catch (error) {
+        console.error('Error fetching investment profiles:', error);
+        res.status(500).json({ error: 'Failed to fetch investment profiles' });
     }
 });
 

@@ -428,6 +428,143 @@ class StockMarketApp {
 
         // Load initial market news
         this.loadMarketNews();
+        
+        // Investment simulator event listeners
+        this.bindInvestmentSimulatorEvents();
+    }
+
+    // Investment Simulator Event Listeners
+    bindInvestmentSimulatorEvents() {
+        // Simulator tabs
+        document.querySelectorAll('.investment-simulator .tab-btn').forEach(btn => {
+            btn.addEventListener('click', (e) => {
+                this.switchSimulatorTab(e.target.dataset.tab);
+            });
+        });
+
+        // Future projection simulation
+        document.getElementById('simulateFutureBtn').addEventListener('click', () => {
+            this.runFutureProjection();
+        });
+
+        // Historical what-if simulation
+        document.getElementById('simulateHistoricalBtn').addEventListener('click', () => {
+            this.runHistoricalWhatIf();
+        });
+
+        // Portfolio simulation
+        document.getElementById('simulatePortfolioBtn').addEventListener('click', () => {
+            this.runPortfolioSimulation();
+        });
+
+        // Portfolio builder
+        document.getElementById('addAllocationBtn').addEventListener('click', () => {
+            this.addPortfolioAllocation();
+        });
+
+        // Portfolio allocation change listeners
+        this.bindPortfolioAllocationListeners();
+    }
+
+    switchSimulatorTab(tabName) {
+        // Remove active class from all tabs and content
+        document.querySelectorAll('.investment-simulator .tab-btn').forEach(btn => btn.classList.remove('active'));
+        document.querySelectorAll('.investment-simulator .tab-content').forEach(content => content.classList.remove('active'));
+        
+        // Add active class to selected tab and content
+        document.querySelector(`[data-tab="${tabName}"]`).classList.add('active');
+        document.getElementById(`${tabName}-tab`).classList.add('active');
+    }
+
+    async runFutureProjection() {
+        const amount = parseFloat(document.getElementById('futureAmount').value);
+        const symbol = document.getElementById('futureSymbol').value;
+        const days = parseInt(document.getElementById('futureDays').value);
+        const confidenceLevel = parseFloat(document.getElementById('confidenceLevel').value);
+
+        if (!amount || !symbol || !days) {
+            this.showError('Please fill in all required fields');
+            return;
+        }
+
+        this.showLoading(true);
+        try {
+            const response = await fetch('/api/simulate-future-investment', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ amount, symbol, days, confidenceLevel })
+            });
+
+            const data = await response.json();
+            this.renderFutureProjectionResults(data);
+            document.getElementById('futureResults').style.display = 'block';
+        } catch (error) {
+            this.showError('Failed to run future projection simulation');
+        } finally {
+            this.showLoading(false);
+        }
+    }
+
+    async runHistoricalWhatIf() {
+        const amount = parseFloat(document.getElementById('historicalAmount').value);
+        const symbol = document.getElementById('historicalSymbol').value;
+        const daysAgo = parseInt(document.getElementById('daysAgo').value);
+
+        if (!amount || !symbol || !daysAgo) {
+            this.showError('Please fill in all required fields');
+            return;
+        }
+
+        this.showLoading(true);
+        try {
+            const response = await fetch('/api/simulate-historical-whatif', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ amount, symbol, daysAgo })
+            });
+
+            const data = await response.json();
+            this.renderHistoricalWhatIfResults(data);
+            document.getElementById('historicalResults').style.display = 'block';
+        } catch (error) {
+            this.showError('Failed to run historical what-if analysis');
+        } finally {
+            this.showLoading(false);
+        }
+    }
+
+    async runPortfolioSimulation() {
+        const totalAmount = parseFloat(document.getElementById('portfolioAmount').value);
+        const days = parseInt(document.getElementById('portfolioDays').value);
+        const portfolio = this.getPortfolioAllocations();
+
+        if (!totalAmount || !days) {
+            this.showError('Please fill in total amount and investment horizon');
+            return;
+        }
+
+        const totalAllocation = Object.values(portfolio).reduce((sum, allocation) => sum + allocation, 0);
+        if (Math.abs(totalAllocation - 100) > 0.01) {
+            this.showError('Portfolio allocations must sum to 100%');
+            return;
+        }
+
+        this.showLoading(true);
+        try {
+            const response = await fetch('/api/simulate-portfolio', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ portfolio, totalAmount, days })
+            });
+
+            const data = await response.json();
+            this.renderPortfolioSimulationResults(data);
+            document.getElementById('portfolioResults').style.display = 'block';
+        } catch (error) {
+            this.showError('Failed to run portfolio simulation');
+        } finally {
+            this.showLoading(false);
+        }
     }
 
     async searchCompany() {
@@ -1124,6 +1261,301 @@ class StockMarketApp {
         // Add active class to selected tab and content
         document.querySelector(`[data-tab="${tabName}"]`).classList.add('active');
         document.getElementById(`${tabName}-tab`).classList.add('active');
+    }
+
+    renderFutureProjectionResults(data) {
+        const container = document.getElementById('futureResults');
+        container.innerHTML = `
+            <div class="results-header">
+                <h3><i class="fas fa-chart-line"></i> Future Investment Projection Results</h3>
+                <p>Investment: $${data.initialAmount.toFixed(2)} in ${data.symbol} for ${data.days} days</p>
+            </div>
+            
+            <div class="investment-summary">
+                <div class="summary-card">
+                    <h4>Expected Value</h4>
+                    <div class="value neutral">$${data.projectedValue.expected.toFixed(2)}</div>
+                    <div class="change">${data.returns.expected > 0 ? '+' : ''}${data.returns.expected.toFixed(2)}%</div>
+                </div>
+                <div class="summary-card">
+                    <h4>Best Case Scenario</h4>
+                    <div class="value positive">$${data.projectedValue.best.toFixed(2)}</div>
+                    <div class="change">+${data.returns.bestCase.toFixed(2)}%</div>
+                </div>
+                <div class="summary-card">
+                    <h4>Worst Case Scenario</h4>
+                    <div class="value negative">$${data.projectedValue.worst.toFixed(2)}</div>
+                    <div class="change">${data.returns.worstCase.toFixed(2)}%</div>
+                </div>
+                <div class="summary-card">
+                    <h4>Median Outcome</h4>
+                    <div class="value neutral">$${data.projectedValue.median.toFixed(2)}</div>
+                    <div class="change">${((data.projectedValue.median - data.initialAmount) / data.initialAmount * 100).toFixed(2)}%</div>
+                </div>
+            </div>
+
+            <div class="scenarios-grid">
+                <div class="scenario-card">
+                    <h5>Bull Market</h5>
+                    <div class="scenario-value positive">$${data.scenarios.bull.toFixed(2)}</div>
+                </div>
+                <div class="scenario-card">
+                    <h5>Bear Market</h5>
+                    <div class="scenario-value negative">$${data.scenarios.bear.toFixed(2)}</div>
+                </div>
+                <div class="scenario-card">
+                    <h5>Neutral Market</h5>
+                    <div class="scenario-value neutral">$${data.scenarios.neutral.toFixed(2)}</div>
+                </div>
+            </div>
+
+            <div class="risk-metrics">
+                <div class="risk-metric">
+                    <div class="metric-label">Volatility</div>
+                    <div class="metric-value">${data.riskMetrics.volatility.toFixed(1)}%</div>
+                </div>
+                <div class="risk-metric">
+                    <div class="metric-label">Max Drawdown</div>
+                    <div class="metric-value">${(data.riskMetrics.maxDrawdown * 100).toFixed(1)}%</div>
+                </div>
+                <div class="risk-metric">
+                    <div class="metric-label">Sharpe Ratio</div>
+                    <div class="metric-value">${data.riskMetrics.sharpeRatio.toFixed(2)}</div>
+                </div>
+            </div>
+
+            <div class="warning-box">
+                <i class="fas fa-exclamation-triangle"></i>
+                These projections are estimates based on historical data and should not be considered as financial advice.
+            </div>
+        `;
+    }
+
+    renderHistoricalWhatIfResults(data) {
+        const container = document.getElementById('historicalResults');
+        const gainLoss = data.totalReturn >= 0 ? 'positive' : 'negative';
+        
+        container.innerHTML = `
+            <div class="results-header">
+                <h3><i class="fas fa-history"></i> Historical "What If" Analysis</h3>
+                <p>If you invested $${data.initialAmount.toFixed(2)} in ${data.symbol} on ${data.investmentDate}</p>
+            </div>
+            
+            <div class="investment-summary">
+                <div class="summary-card">
+                    <h4>Current Value</h4>
+                    <div class="value ${gainLoss}">$${data.currentValue.toFixed(2)}</div>
+                </div>
+                <div class="summary-card">
+                    <h4>Total Return</h4>
+                    <div class="value ${gainLoss}">${data.totalReturn >= 0 ? '+' : ''}$${data.totalReturn.toFixed(2)}</div>
+                </div>
+                <div class="summary-card">
+                    <h4>Percentage Return</h4>
+                    <div class="value ${gainLoss}">${data.percentageReturn >= 0 ? '+' : ''}${data.percentageReturn.toFixed(2)}%</div>
+                </div>
+                <div class="summary-card">
+                    <h4>Annualized Return</h4>
+                    <div class="value ${gainLoss}">${data.annualizedReturn.toFixed(2)}%</div>
+                </div>
+            </div>
+
+            <div class="historical-comparison">
+                <h4>Market Comparison</h4>
+                <div class="comparison-grid">
+                    <div class="comparison-item">
+                        <div class="label">S&P 500 Return</div>
+                        <div class="value">${data.comparison.spyReturn.toFixed(2)}%</div>
+                    </div>
+                    <div class="comparison-item">
+                        <div class="label">Inflation Adjusted</div>
+                        <div class="value">$${data.comparison.inflationAdjusted.toFixed(2)}</div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="scenarios-grid">
+                <div class="scenario-card">
+                    <h5>Bull Market Scenario</h5>
+                    <div class="scenario-value positive">$${data.scenarios.bull.value.toFixed(2)}</div>
+                </div>
+                <div class="scenario-card">
+                    <h5>Bear Market Scenario</h5>
+                    <div class="scenario-value negative">$${data.scenarios.bear.value.toFixed(2)}</div>
+                </div>
+                <div class="scenario-card">
+                    <h5>Market Crash Scenario</h5>
+                    <div class="scenario-value negative">$${data.scenarios.crash.value.toFixed(2)}</div>
+                </div>
+            </div>
+
+            <div class="warning-box">
+                <i class="fas fa-info-circle"></i>
+                This analysis is based on simulated historical performance and may not reflect actual market conditions.
+            </div>
+        `;
+    }
+
+    renderPortfolioSimulationResults(data) {
+        const container = document.getElementById('portfolioResults');
+        const expectedReturn = data.portfolioMetrics.expectedReturn;
+        const returnClass = expectedReturn >= 0 ? 'positive' : 'negative';
+        
+        container.innerHTML = `
+            <div class="results-header">
+                <h3><i class="fas fa-pie-chart"></i> Portfolio Simulation Results</h3>
+                <p>Investment: $${data.totalAmount.toFixed(2)} for ${data.days} days</p>
+            </div>
+            
+            <div class="investment-summary">
+                <div class="summary-card">
+                    <h4>Expected Portfolio Value</h4>
+                    <div class="value ${returnClass}">$${data.portfolioMetrics.expectedValue.toFixed(2)}</div>
+                </div>
+                <div class="summary-card">
+                    <h4>Expected Return</h4>
+                    <div class="value ${returnClass}">${expectedReturn >= 0 ? '+' : ''}${expectedReturn.toFixed(2)}%</div>
+                </div>
+                <div class="summary-card">
+                    <h4>Portfolio Volatility</h4>
+                    <div class="value neutral">${data.portfolioMetrics.volatility.toFixed(2)}%</div>
+                </div>
+                <div class="summary-card">
+                    <h4>Sharpe Ratio</h4>
+                    <div class="value neutral">${data.portfolioMetrics.sharpeRatio.toFixed(2)}</div>
+                </div>
+            </div>
+
+            <div class="portfolio-breakdown">
+                <h4>Portfolio Breakdown</h4>
+                ${Object.entries(data.portfolio).map(([symbol, details]) => `
+                    <div class="portfolio-item">
+                        <div class="symbol">${symbol}</div>
+                        <div class="allocation">${details.allocation}% ($${details.amount.toFixed(2)})</div>
+                        <div class="projected-value">$${details.simulation.projectedValue.expected.toFixed(2)}</div>
+                    </div>
+                `).join('')}
+            </div>
+
+            <div class="risk-metrics">
+                <div class="risk-metric">
+                    <div class="metric-label">Value at Risk (95%)</div>
+                    <div class="metric-value">$${Math.abs(data.riskAnalysis.valueAtRisk).toFixed(2)}</div>
+                </div>
+                <div class="risk-metric">
+                    <div class="metric-label">Conditional VaR</div>
+                    <div class="metric-value">$${Math.abs(data.riskAnalysis.conditionalVaR).toFixed(2)}</div>
+                </div>
+                <div class="risk-metric">
+                    <div class="metric-label">Diversification Benefit</div>
+                    <div class="metric-value">${(data.portfolioMetrics.diversificationBenefit * 100).toFixed(1)}%</div>
+                </div>
+            </div>
+
+            <div class="warning-box">
+                <i class="fas fa-shield-alt"></i>
+                Diversification can help reduce risk, but it does not guarantee profits or protect against losses.
+            </div>
+        `;
+    }
+
+    addPortfolioAllocation() {
+        const container = document.getElementById('portfolioAllocations');
+        const allocationItem = document.createElement('div');
+        allocationItem.className = 'allocation-item';
+        allocationItem.innerHTML = `
+            <select class="asset-select">
+                <option value="AAPL">Apple (AAPL)</option>
+                <option value="MSFT">Microsoft (MSFT)</option>
+                <option value="GOOGL">Google (GOOGL)</option>
+                <option value="AMZN">Amazon (AMZN)</option>
+                <option value="TSLA">Tesla (TSLA)</option>
+                <option value="META">Meta (META)</option>
+                <option value="NVDA">NVIDIA (NVDA)</option>
+                <option value="SPY">S&P 500 (SPY)</option>
+                <option value="QQQ">NASDAQ (QQQ)</option>
+                <option value="moderate">Moderate Portfolio</option>
+                <option value="conservative">Conservative Portfolio</option>
+            </select>
+            <input type="number" class="allocation-percent" placeholder="0" min="0" max="100" step="0.1">
+            <span>%</span>
+            <button class="remove-allocation btn btn-secondary">Remove</button>
+        `;
+        
+        container.appendChild(allocationItem);
+        this.bindPortfolioAllocationListeners();
+    }
+
+    bindPortfolioAllocationListeners() {
+        // Remove allocation listeners
+        document.querySelectorAll('.remove-allocation').forEach(btn => {
+            btn.removeEventListener('click', this.removeAllocation);
+            btn.addEventListener('click', this.removeAllocation.bind(this));
+        });
+
+        // Allocation change listeners
+        document.querySelectorAll('.allocation-percent').forEach(input => {
+            input.removeEventListener('input', this.updateTotalAllocation);
+            input.addEventListener('input', this.updateTotalAllocation.bind(this));
+        });
+
+        this.updateTotalAllocation();
+    }
+
+    removeAllocation(event) {
+        event.target.closest('.allocation-item').remove();
+        this.updateTotalAllocation();
+    }
+
+    updateTotalAllocation() {
+        const allocations = document.querySelectorAll('.allocation-percent');
+        let total = 0;
+        allocations.forEach(input => {
+            total += parseFloat(input.value) || 0;
+        });
+        
+        const totalElement = document.getElementById('totalAllocation');
+        totalElement.textContent = total.toFixed(1);
+        
+        // Color coding for total
+        if (Math.abs(total - 100) < 0.1) {
+            totalElement.style.color = '#10b981'; // Green
+        } else if (total > 100) {
+            totalElement.style.color = '#ef4444'; // Red
+        } else {
+            totalElement.style.color = '#f59e0b'; // Orange
+        }
+    }
+
+    getPortfolioAllocations() {
+        const portfolio = {};
+        const allocationItems = document.querySelectorAll('.allocation-item');
+        
+        allocationItems.forEach(item => {
+            const symbol = item.querySelector('.asset-select').value;
+            const allocation = parseFloat(item.querySelector('.allocation-percent').value) || 0;
+            if (allocation > 0) {
+                portfolio[symbol] = allocation;
+            }
+        });
+        
+        return portfolio;
+    }
+
+    getTimeAgo(dateString) {
+        const date = new Date(dateString);
+        const now = new Date();
+        const diffMs = now - date;
+        const diffHours = Math.floor(diffMs / (1000 * 60 * 60));
+        const diffDays = Math.floor(diffHours / 24);
+        
+        if (diffDays > 0) {
+            return `${diffDays} day${diffDays > 1 ? 's' : ''} ago`;
+        } else if (diffHours > 0) {
+            return `${diffHours} hour${diffHours > 1 ? 's' : ''} ago`;
+        } else {
+            return 'Recently';
+        }
     }
 
     formatLargeNumber(num) {

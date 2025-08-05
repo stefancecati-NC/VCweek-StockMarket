@@ -1696,3 +1696,400 @@ section h2 i {
         align-items: flex-start;
     }
 }
+
+/* Investment Simulator Styles */
+.investment-simulator {
+    background: rgba(255, 255, 255, 0.95);
+    backdrop-filter: blur(10px);
+    border-radius: 20px;
+    padding: 30px;
+    margin-bottom: 30px;
+    box-shadow: 0 8px 32px rgba(0, 0, 0, 0.1);
+}
+
+.simulator-tabs {
+    display: flex;
+    gap: 5px;
+    margin-bottom: 30px;
+    background: rgba(255, 255, 255, 0.7);
+    padding: 5px;
+    border-radius: 15px;
+    flex-wrap: wrap;
+}
+
+.simulator-tabs .tab-btn {
+    padding: 12px 20px;
+    border: none;
+    background: transparent;
+    border-radius: 10px;
+    font-weight: 500;
+    color: #666;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    flex: 1;
+    min-width: 150px;
+}
+
+.simulator-tabs .tab-btn:hover {
+    background: rgba(102, 126, 234, 0.1);
+    color: #667eea;
+}
+
+.simulator-tabs .tab-btn.active {
+    background: linear-gradient(135deg, #667eea, #764ba2);
+    color: white;
+    box-shadow: 0 4px 15px rgba(102, 126, 234, 0.3);
+}
+
+.simulation-form {
+    background: linear-gradient(135deg, rgba(102, 126, 234, 0.05), rgba(118, 75, 162, 0.05));
+    padding: 25px;
+    border-radius: 15px;
+    margin-bottom: 25px;
+    border: 1px solid rgba(102, 126, 234, 0.1);
+}
+
+.simulation-form h3 {
+    color: #667eea;
+    margin-bottom: 10px;
+    font-size: 1.4rem;
+}
+
+.simulation-form p {
+    color: #666;
+    margin-bottom: 20px;
+}
+
+.form-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+    gap: 20px;
+    margin-bottom: 25px;
+}
+
+.form-group {
+    display: flex;
+    flex-direction: column;
+}
+
+.form-group.full-width {
+    grid-column: 1 / -1;
+}
+
+.form-group label {
+    font-weight: 500;
+    color: #333;
+    margin-bottom: 8px;
+    font-size: 0.95rem;
+}
+
+.form-group input,
+.form-group select {
+    padding: 12px 15px;
+    border: 2px solid rgba(102, 126, 234, 0.2);
+    border-radius: 10px;
+    font-size: 1rem;
+    transition: all 0.3s ease;
+    background: white;
+}
+
+.form-group input:focus,
+.form-group select:focus {
+    outline: none;
+    border-color: #667eea;
+    box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1);
+}
+
+.portfolio-builder {
+    background: rgba(255, 255, 255, 0.8);
+    padding: 20px;
+    border-radius: 10px;
+    margin: 20px 0;
+}
+
+.portfolio-builder h4 {
+    color: #667eea;
+    margin-bottom: 15px;
+}
+
+.allocation-item {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    margin-bottom: 10px;
+    padding: 10px;
+    background: rgba(102, 126, 234, 0.05);
+    border-radius: 8px;
+}
+
+.asset-select {
+    flex: 2;
+    padding: 8px 12px;
+    border: 1px solid rgba(102, 126, 234, 0.3);
+    border-radius: 6px;
+}
+
+.allocation-percent {
+    flex: 1;
+    padding: 8px 12px;
+    border: 1px solid rgba(102, 126, 234, 0.3);
+    border-radius: 6px;
+    text-align: center;
+}
+
+.remove-allocation {
+    padding: 8px 12px;
+    font-size: 0.85rem;
+}
+
+.allocation-total {
+    text-align: center;
+    font-weight: 600;
+    color: #667eea;
+    margin-top: 15px;
+    font-size: 1.1rem;
+}
+
+.simulation-results {
+    background: linear-gradient(135deg, rgba(102, 126, 234, 0.03), rgba(118, 75, 162, 0.03));
+    padding: 25px;
+    border-radius: 15px;
+    border: 1px solid rgba(102, 126, 234, 0.1);
+}
+
+.results-header {
+    text-align: center;
+    margin-bottom: 25px;
+}
+
+.results-header h3 {
+    color: #667eea;
+    margin-bottom: 10px;
+}
+
+.investment-summary {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+    gap: 20px;
+    margin-bottom: 25px;
+}
+
+.summary-card {
+    background: white;
+    padding: 20px;
+    border-radius: 12px;
+    text-align: center;
+    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.05);
+    border: 1px solid rgba(102, 126, 234, 0.1);
+}
+
+.summary-card h4 {
+    color: #667eea;
+    font-size: 0.9rem;
+    margin-bottom: 8px;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+}
+
+.summary-card .value {
+    font-size: 1.5rem;
+    font-weight: 700;
+    margin-bottom: 5px;
+}
+
+.summary-card .positive {
+    color: #10b981;
+}
+
+.summary-card .negative {
+    color: #ef4444;
+}
+
+.summary-card .neutral {
+    color: #667eea;
+}
+
+.scenarios-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+    gap: 15px;
+    margin: 20px 0;
+}
+
+.scenario-card {
+    background: white;
+    padding: 15px;
+    border-radius: 10px;
+    text-align: center;
+    border: 1px solid rgba(102, 126, 234, 0.1);
+}
+
+.scenario-card h5 {
+    font-size: 0.85rem;
+    color: #666;
+    margin-bottom: 8px;
+}
+
+.scenario-card .scenario-value {
+    font-size: 1.2rem;
+    font-weight: 600;
+}
+
+.risk-metrics {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+    gap: 15px;
+    margin: 20px 0;
+}
+
+.risk-metric {
+    background: rgba(102, 126, 234, 0.05);
+    padding: 15px;
+    border-radius: 10px;
+    text-align: center;
+}
+
+.risk-metric .metric-label {
+    font-size: 0.85rem;
+    color: #666;
+    margin-bottom: 5px;
+}
+
+.risk-metric .metric-value {
+    font-size: 1.1rem;
+    font-weight: 600;
+    color: #667eea;
+}
+
+.historical-comparison {
+    background: rgba(255, 255, 255, 0.8);
+    padding: 20px;
+    border-radius: 10px;
+    margin: 20px 0;
+}
+
+.historical-comparison h4 {
+    color: #667eea;
+    margin-bottom: 15px;
+}
+
+.comparison-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+    gap: 15px;
+}
+
+.comparison-item {
+    text-align: center;
+    padding: 15px;
+    background: rgba(102, 126, 234, 0.03);
+    border-radius: 8px;
+}
+
+.comparison-item .label {
+    font-size: 0.9rem;
+    color: #666;
+    margin-bottom: 8px;
+}
+
+.comparison-item .value {
+    font-size: 1.2rem;
+    font-weight: 600;
+    color: #667eea;
+}
+
+.portfolio-breakdown {
+    background: white;
+    padding: 20px;
+    border-radius: 10px;
+    margin: 20px 0;
+    border: 1px solid rgba(102, 126, 234, 0.1);
+}
+
+.portfolio-breakdown h4 {
+    color: #667eea;
+    margin-bottom: 15px;
+}
+
+.portfolio-item {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 12px 0;
+    border-bottom: 1px solid rgba(102, 126, 234, 0.1);
+}
+
+.portfolio-item:last-child {
+    border-bottom: none;
+}
+
+.portfolio-item .symbol {
+    font-weight: 600;
+    color: #333;
+}
+
+.portfolio-item .allocation {
+    color: #666;
+    font-size: 0.9rem;
+}
+
+.portfolio-item .projected-value {
+    font-weight: 600;
+    color: #667eea;
+}
+
+.warning-box {
+    background: linear-gradient(135deg, #fbbf24, #f59e0b);
+    color: white;
+    padding: 15px;
+    border-radius: 10px;
+    margin: 20px 0;
+    text-align: center;
+}
+
+.warning-box i {
+    margin-right: 8px;
+}
+
+/* Responsive Design for Investment Simulator */
+@media (max-width: 768px) {
+    .simulator-tabs {
+        flex-direction: column;
+    }
+    
+    .simulator-tabs .tab-btn {
+        min-width: auto;
+    }
+    
+    .form-grid {
+        grid-template-columns: 1fr;
+    }
+    
+    .allocation-item {
+        flex-direction: column;
+        gap: 10px;
+        align-items: stretch;
+    }
+    
+    .investment-summary {
+        grid-template-columns: 1fr;
+    }
+    
+    .scenarios-grid {
+        grid-template-columns: repeat(2, 1fr);
+    }
+    
+    .risk-metrics {
+        grid-template-columns: 1fr;
+    }
+}
+
+@media (max-width: 480px) {
+    .scenarios-grid {
+        grid-template-columns: 1fr;
+    }
+    
+    .comparison-grid {
+        grid-template-columns: 1fr;
+    }
+}

@@ -305,6 +305,163 @@
             </div>
         </section>
 
+        <!-- Investment Simulator -->
+        <section class="investment-simulator">
+            <h2><i class="fas fa-calculator"></i> Investment Simulator</h2>
+            
+            <div class="simulator-tabs">
+                <button class="tab-btn active" data-tab="future-projection">Future Projection</button>
+                <button class="tab-btn" data-tab="historical-whatif">Historical What-If</button>
+                <button class="tab-btn" data-tab="portfolio-simulation">Portfolio Simulation</button>
+            </div>
+
+            <!-- Future Projection Tab -->
+            <div class="tab-content active" id="future-projection-tab">
+                <div class="simulation-form">
+                    <h3><i class="fas fa-chart-line"></i> Future Investment Projection</h3>
+                    <p>See how your investment might grow over time</p>
+                    
+                    <div class="form-grid">
+                        <div class="form-group">
+                            <label for="futureAmount">Investment Amount ($)</label>
+                            <input type="number" id="futureAmount" placeholder="1000" min="1" step="0.01">
+                        </div>
+                        <div class="form-group">
+                            <label for="futureSymbol">Stock/Asset</label>
+                            <select id="futureSymbol">
+                                <option value="AAPL">Apple (AAPL)</option>
+                                <option value="MSFT">Microsoft (MSFT)</option>
+                                <option value="GOOGL">Google (GOOGL)</option>
+                                <option value="AMZN">Amazon (AMZN)</option>
+                                <option value="TSLA">Tesla (TSLA)</option>
+                                <option value="SPY">S&P 500 (SPY)</option>
+                                <option value="QQQ">NASDAQ (QQQ)</option>
+                                <option value="moderate">Moderate Portfolio</option>
+                                <option value="aggressive">Aggressive Portfolio</option>
+                            </select>
+                        </div>
+                        <div class="form-group">
+                            <label for="futureDays">Time Horizon (Days)</label>
+                            <input type="number" id="futureDays" placeholder="365" min="1" max="3650">
+                        </div>
+                        <div class="form-group">
+                            <label for="confidenceLevel">Confidence Level</label>
+                            <select id="confidenceLevel">
+                                <option value="0.68">68% (1 Std Dev)</option>
+                                <option value="0.95">95% (2 Std Dev)</option>
+                                <option value="0.99">99% (3 Std Dev)</option>
+                            </select>
+                        </div>
+                    </div>
+                    
+                    <button id="simulateFutureBtn" class="btn btn-primary">
+                        <i class="fas fa-play"></i> Run Simulation
+                    </button>
+                </div>
+                
+                <div class="simulation-results" id="futureResults" style="display: none;">
+                    <!-- Future projection results will be populated here -->
+                </div>
+            </div>
+
+            <!-- Historical What-If Tab -->
+            <div class="tab-content" id="historical-whatif-tab">
+                <div class="simulation-form">
+                    <h3><i class="fas fa-history"></i> Historical "What If" Analysis</h3>
+                    <p>See what your investment would be worth today if you invested in the past</p>
+                    
+                    <div class="form-grid">
+                        <div class="form-group">
+                            <label for="historicalAmount">Investment Amount ($)</label>
+                            <input type="number" id="historicalAmount" placeholder="1000" min="1" step="0.01">
+                        </div>
+                        <div class="form-group">
+                            <label for="historicalSymbol">Stock/Asset</label>
+                            <select id="historicalSymbol">
+                                <option value="AAPL">Apple (AAPL)</option>
+                                <option value="MSFT">Microsoft (MSFT)</option>
+                                <option value="GOOGL">Google (GOOGL)</option>
+                                <option value="AMZN">Amazon (AMZN)</option>
+                                <option value="TSLA">Tesla (TSLA)</option>
+                                <option value="SPY">S&P 500 (SPY)</option>
+                                <option value="QQQ">NASDAQ (QQQ)</option>
+                            </select>
+                        </div>
+                        <div class="form-group">
+                            <label for="daysAgo">Days Ago</label>
+                            <select id="daysAgo">
+                                <option value="30">1 Month Ago</option>
+                                <option value="90">3 Months Ago</option>
+                                <option value="180">6 Months Ago</option>
+                                <option value="365">1 Year Ago</option>
+                                <option value="730">2 Years Ago</option>
+                                <option value="1095">3 Years Ago</option>
+                                <option value="1825">5 Years Ago</option>
+                            </select>
+                        </div>
+                    </div>
+                    
+                    <button id="simulateHistoricalBtn" class="btn btn-primary">
+                        <i class="fas fa-search"></i> Calculate What-If
+                    </button>
+                </div>
+                
+                <div class="simulation-results" id="historicalResults" style="display: none;">
+                    <!-- Historical what-if results will be populated here -->
+                </div>
+            </div>
+
+            <!-- Portfolio Simulation Tab -->
+            <div class="tab-content" id="portfolio-simulation-tab">
+                <div class="simulation-form">
+                    <h3><i class="fas fa-pie-chart"></i> Portfolio Simulation</h3>
+                    <p>Simulate a diversified portfolio with multiple assets</p>
+                    
+                    <div class="form-grid">
+                        <div class="form-group full-width">
+                            <label for="portfolioAmount">Total Investment Amount ($)</label>
+                            <input type="number" id="portfolioAmount" placeholder="10000" min="1" step="0.01">
+                        </div>
+                        <div class="form-group full-width">
+                            <label for="portfolioDays">Investment Horizon (Days)</label>
+                            <input type="number" id="portfolioDays" placeholder="365" min="1" max="3650">
+                        </div>
+                    </div>
+                    
+                    <div class="portfolio-builder">
+                        <h4>Portfolio Allocation</h4>
+                        <div id="portfolioAllocations">
+                            <div class="allocation-item">
+                                <select class="asset-select">
+                                    <option value="AAPL">Apple (AAPL)</option>
+                                    <option value="MSFT">Microsoft (MSFT)</option>
+                                    <option value="GOOGL">Google (GOOGL)</option>
+                                    <option value="SPY">S&P 500 (SPY)</option>
+                                </select>
+                                <input type="number" class="allocation-percent" placeholder="25" min="0" max="100" step="0.1">
+                                <span>%</span>
+                                <button class="remove-allocation btn btn-secondary">Remove</button>
+                            </div>
+                        </div>
+                        <button id="addAllocationBtn" class="btn btn-secondary">
+                            <i class="fas fa-plus"></i> Add Asset
+                        </button>
+                        <div class="allocation-total">
+                            Total: <span id="totalAllocation">0</span>%
+                        </div>
+                    </div>
+                    
+                    <button id="simulatePortfolioBtn" class="btn btn-primary">
+                        <i class="fas fa-chart-pie"></i> Simulate Portfolio
+                    </button>
+                </div>
+                
+                <div class="simulation-results" id="portfolioResults" style="display: none;">
+                    <!-- Portfolio simulation results will be populated here -->
+                </div>
+            </div>
+        </section>
+
         <!-- Footer -->
         <footer class="footer">
             <p>&copy; 2024 Daily Stock Market Summary. Data for educational purposes only.</p>
