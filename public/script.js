@@ -52,7 +52,8 @@ class StockMarketApp {
             await Promise.all([
                 this.loadDailySummary(),
                 this.loadMarketData(),
-                this.loadEarningsCalendar()
+                this.loadEarningsCalendar(),
+                this.loadStrategyTemplates()
             ]);
             this.updateLastUpdatedTime();
         } catch (error) {
@@ -437,6 +438,9 @@ class StockMarketApp {
         
         // Investment simulator event listeners
         this.bindInvestmentSimulatorEvents();
+        
+        // Options trading event listeners
+        this.bindOptionsEventListeners();
     }
 
     // Investment Simulator Event Listeners
@@ -1878,6 +1882,800 @@ class StockMarketApp {
                 </div>
             `;
         }
+    }
+
+    async loadStrategyTemplates() {
+        try {
+            const response = await fetch(`${this.apiBaseUrl}/options-strategies`);
+            const strategies = await response.json();
+            this.renderStrategyTemplates(strategies);
+            // Load default expiration dates for strategy builder
+            this.loadDefaultStrategyExpirations();
+        } catch (error) {
+            console.error('Error loading strategy templates:', error);
+        }
+    }
+
+    loadDefaultStrategyExpirations() {
+        // Generate some default expiration dates
+        const select = document.getElementById('strategyExpiration');
+        select.innerHTML = '<option value="">Select expiration date...</option>';
+        
+        const today = new Date();
+        const expirations = [];
+        
+        // Add weekly expirations for next 4 weeks
+        for (let i = 1; i <= 4; i++) {
+            const friday = new Date(today);
+            friday.setDate(today.getDate() + (5 - today.getDay() + 7 * (i - 1)));
+            if (friday > today) {
+                const days = Math.ceil((friday - today) / (1000 * 60 * 60 * 24));
+                expirations.push({
+                    date: friday.toISOString().split('T')[0],
+                    days: days
+                });
+            }
+        }
+        
+        // Add monthly expirations for next 3 months
+        for (let i = 1; i <= 3; i++) {
+            const monthly = new Date(today.getFullYear(), today.getMonth() + i, 1);
+            const thirdFriday = new Date(monthly);
+            thirdFriday.setDate(1);
+            while (thirdFriday.getDay() !== 5) {
+                thirdFriday.setDate(thirdFriday.getDate() + 1);
+            }
+            thirdFriday.setDate(thirdFriday.getDate() + 14);
+            
+            const days = Math.ceil((thirdFriday - today) / (1000 * 60 * 60 * 24));
+            expirations.push({
+                date: thirdFriday.toISOString().split('T')[0],
+                days: days
+            });
+        }
+        
+        // Sort by date and add to select
+        expirations.sort((a, b) => new Date(a.date) - new Date(b.date));
+        expirations.forEach(exp => {
+            const option = document.createElement('option');
+            option.value = exp.date;
+            option.textContent = `${exp.date} (${exp.days} days)`;
+            select.appendChild(option);
+        });
+    }
+
+    renderStrategyTemplates(strategies) {
+        const container = document.getElementById('strategyTemplates');
+        container.innerHTML = Object.entries(strategies).map(([key, strategy]) => `
+            <div class="strategy-template" data-strategy="${key}">
+                <div class="template-name">${strategy.name}</div>
+                <div class="template-description">${strategy.description}</div>
+                <div class="template-metrics">
+                    <div class="template-metric">
+                        <span class="metric-label">Max Profit:</span>
+                        <span class="metric-value">${strategy.maxProfit}</span>
+                    </div>
+                    <div class="template-metric">
+                        <span class="metric-label">Max Loss:</span>
+                        <span class="metric-value">${strategy.maxLoss}</span>
+                    </div>
+                    <div class="template-metric">
+                        <span class="metric-label">Outlook:</span>
+                        <span class="metric-value">${strategy.outlook}</span>
+                    </div>
+                </div>
+            </div>
+        `).join('');
+
+        // Bind click events to templates
+        container.querySelectorAll('.strategy-template').forEach(template => {
+            template.addEventListener('click', () => {
+                this.selectStrategyTemplate(template.dataset.strategy, strategies[template.dataset.strategy]);
+            });
+        });
+
+        // Add a default strategy leg for users to start with
+        if (document.getElementById('strategyLegs').children.length === 0) {
+            this.addStrategyLeg();
+        }
+    }
+
+    selectStrategyTemplate(strategyKey, strategy) {
+        // Remove previous selection
+        document.querySelectorAll('.strategy-template').forEach(t => t.classList.remove('selected'));
+        
+        // Select current template
+        document.querySelector(`[data-strategy="${strategyKey}"]`).classList.add('selected');
+        
+        // Clear existing legs
+        document.getElementById('strategyLegs').innerHTML = '';
+        
+        // Add legs based on template
+        strategy.legs.forEach(leg => {
+            this.addStrategyLeg();
+            const legElement = document.querySelector('.strategy-leg:last-child');
+            if (leg.type !== 'stock') {
+                legElement.querySelector('.leg-type').value = leg.type;
+            }
+            legElement.querySelector('.leg-action').value = leg.action;
+            legElement.querySelector('.leg-quantity').value = leg.quantity;
+        });
+    }
+
+    // Options Trading Functionality
+    bindOptionsEventListeners() {
+        // Options tabs
+        document.querySelectorAll('.options-tabs .tab-btn').forEach(btn => {
+            btn.addEventListener('click', () => {
+                this.switchOptionsTab(btn.dataset.tab);
+            });
+        });
+
+        // Options chain
+        document.getElementById('loadOptionsChainBtn').addEventListener('click', () => {
+            this.loadOptionsChain();
+        });
+
+        document.getElementById('optionsSymbol').addEventListener('input', (e) => {
+            if (e.target.value.length >= 1) {
+                this.loadExpirationDates(e.target.value);
+            }
+        });
+
+        // Strategy builder
+        document.getElementById('strategySymbol').addEventListener('input', (e) => {
+            if (e.target.value.length >= 1) {
+                this.loadStrategyExpirationDates(e.target.value);
+            }
+        });
+
+        document.getElementById('addLegBtn').addEventListener('click', () => {
+            this.addStrategyLeg();
+        });
+
+        document.getElementById('analyzeStrategyBtn').addEventListener('click', () => {
+            this.analyzeStrategy();
+        });
+
+        // Unusual activity
+        document.getElementById('scanActivityBtn').addEventListener('click', () => {
+            this.scanUnusualActivity();
+        });
+
+        // Expiration calendar
+        document.getElementById('loadCalendarBtn').addEventListener('click', () => {
+            this.loadExpirationCalendar();
+        });
+
+        // Options chain filters
+        document.getElementById('showITMOnly').addEventListener('change', () => {
+            this.filterOptionsChain();
+        });
+
+        document.getElementById('showHighVolume').addEventListener('change', () => {
+            this.filterOptionsChain();
+        });
+
+        document.getElementById('greekHighlight').addEventListener('change', () => {
+            this.highlightGreeks();
+        });
+    }
+
+    switchOptionsTab(tabName) {
+        // Update tab buttons
+        document.querySelectorAll('.options-tabs .tab-btn').forEach(btn => {
+            btn.classList.remove('active');
+        });
+        document.querySelector(`[data-tab="${tabName}"]`).classList.add('active');
+
+        // Update tab content
+        document.querySelectorAll('.options-trading .tab-content').forEach(content => {
+            content.classList.remove('active');
+        });
+        document.getElementById(`${tabName}-tab`).classList.add('active');
+    }
+
+    async loadOptionsChain() {
+        const symbol = document.getElementById('optionsSymbol').value.trim().toUpperCase();
+        const expiration = document.getElementById('optionsExpiration').value;
+
+        if (!symbol) {
+            this.showError('Please enter a symbol');
+            return;
+        }
+
+        this.showLoading(true);
+        try {
+            const response = await fetch(`${this.apiBaseUrl}/options-chain/${symbol}?expiration=${expiration}`);
+            const data = await response.json();
+            
+            this.renderOptionsChain(data);
+            document.getElementById('optionsChainContainer').style.display = 'block';
+        } catch (error) {
+            console.error('Error loading options chain:', error);
+            this.showError('Failed to load options chain');
+        } finally {
+            this.showLoading(false);
+        }
+    }
+
+    async loadExpirationDates(symbol) {
+        try {
+            const response = await fetch(`${this.apiBaseUrl}/options-chain/${symbol}`);
+            const data = await response.json();
+            
+            const select = document.getElementById('optionsExpiration');
+            select.innerHTML = '';
+            
+            data.expirations.forEach(exp => {
+                const option = document.createElement('option');
+                option.value = exp.date;
+                option.textContent = `${exp.date} (${exp.daysToExpiry} days)`;
+                select.appendChild(option);
+            });
+        } catch (error) {
+            console.error('Error loading expiration dates:', error);
+        }
+    }
+
+    async loadStrategyExpirationDates(symbol) {
+        try {
+            const response = await fetch(`${this.apiBaseUrl}/options-chain/${symbol}`);
+            const data = await response.json();
+            
+            const select = document.getElementById('strategyExpiration');
+            select.innerHTML = '<option value="">Select expiration date...</option>';
+            
+            data.expirations.forEach(exp => {
+                const option = document.createElement('option');
+                option.value = exp.date;
+                option.textContent = `${exp.date} (${exp.daysToExpiry} days)`;
+                select.appendChild(option);
+            });
+        } catch (error) {
+            console.error('Error loading strategy expiration dates:', error);
+        }
+    }
+
+    renderOptionsChain(data) {
+        // Update header
+        document.getElementById('chainTitle').textContent = `${data.symbol} Options Chain`;
+        document.getElementById('chainStockInfo').innerHTML = `
+            <div class="stock-price">$${data.stockPrice.toFixed(2)}</div>
+            <div class="timestamp">Updated: ${new Date(data.timestamp).toLocaleTimeString()}</div>
+        `;
+
+        // Render options table
+        const tbody = document.getElementById('optionsChainBody');
+        tbody.innerHTML = '';
+
+        if (data.expirations.length > 0) {
+            const expiration = data.expirations[0];
+            const maxStrikes = Math.min(expiration.calls.length, expiration.puts.length);
+
+            for (let i = 0; i < maxStrikes; i++) {
+                const call = expiration.calls[i];
+                const put = expiration.puts[i];
+                
+                const row = document.createElement('tr');
+                row.innerHTML = `
+                    <td class="${call.inTheMoney ? 'itm-call' : ''}">${call.bid.toFixed(2)}</td>
+                    <td class="${call.inTheMoney ? 'itm-call' : ''}">${call.ask.toFixed(2)}</td>
+                    <td class="${call.inTheMoney ? 'itm-call' : ''}">${call.last.toFixed(2)}</td>
+                    <td class="${call.volume > 1000 ? 'high-volume' : ''}">${call.volume.toLocaleString()}</td>
+                    <td>${call.openInterest.toLocaleString()}</td>
+                    <td>${(call.impliedVolatility * 100).toFixed(1)}%</td>
+                    <td>${call.delta.toFixed(3)}</td>
+                    <td>${call.gamma.toFixed(4)}</td>
+                    <td class="strike-column">${call.strike.toFixed(0)}</td>
+                    <td>${put.gamma.toFixed(4)}</td>
+                    <td>${put.delta.toFixed(3)}</td>
+                    <td>${(put.impliedVolatility * 100).toFixed(1)}%</td>
+                    <td>${put.openInterest.toLocaleString()}</td>
+                    <td class="${put.volume > 1000 ? 'high-volume' : ''}">${put.volume.toLocaleString()}</td>
+                    <td class="${put.inTheMoney ? 'itm-put' : ''}">${put.last.toFixed(2)}</td>
+                    <td class="${put.inTheMoney ? 'itm-put' : ''}">${put.ask.toFixed(2)}</td>
+                    <td class="${put.inTheMoney ? 'itm-put' : ''}">${put.bid.toFixed(2)}</td>
+                `;
+                tbody.appendChild(row);
+            }
+        }
+
+        // Render IV analysis
+        this.renderIVAnalysis(data);
+    }
+
+    renderIVAnalysis(data) {
+        const container = document.getElementById('ivMetrics');
+        if (data.expirations.length > 0) {
+            const expiration = data.expirations[0];
+            const callIVs = expiration.calls.map(c => c.impliedVolatility);
+            const putIVs = expiration.puts.map(p => p.impliedVolatility);
+            
+            const avgCallIV = callIVs.reduce((a, b) => a + b, 0) / callIVs.length;
+            const avgPutIV = putIVs.reduce((a, b) => a + b, 0) / putIVs.length;
+            const overallIV = (avgCallIV + avgPutIV) / 2;
+            
+            container.innerHTML = `
+                <div class="iv-metric">
+                    <div class="iv-metric-label">Average Call IV</div>
+                    <div class="iv-metric-value">${(avgCallIV * 100).toFixed(1)}%</div>
+                </div>
+                <div class="iv-metric">
+                    <div class="iv-metric-label">Average Put IV</div>
+                    <div class="iv-metric-value">${(avgPutIV * 100).toFixed(1)}%</div>
+                </div>
+                <div class="iv-metric">
+                    <div class="iv-metric-label">Overall IV</div>
+                    <div class="iv-metric-value">${(overallIV * 100).toFixed(1)}%</div>
+                </div>
+                <div class="iv-metric">
+                    <div class="iv-metric-label">IV Rank</div>
+                    <div class="iv-metric-value">${Math.floor(Math.random() * 100)}%</div>
+                </div>
+            `;
+        }
+    }
+
+    filterOptionsChain() {
+        const showITMOnly = document.getElementById('showITMOnly').checked;
+        const showHighVolume = document.getElementById('showHighVolume').checked;
+        
+        const rows = document.querySelectorAll('#optionsChainBody tr');
+        rows.forEach(row => {
+            let show = true;
+            
+            if (showITMOnly) {
+                const hasITM = row.querySelector('.itm-call, .itm-put');
+                if (!hasITM) show = false;
+            }
+            
+            if (showHighVolume) {
+                const hasHighVolume = row.querySelector('.high-volume');
+                if (!hasHighVolume) show = false;
+            }
+            
+            row.style.display = show ? '' : 'none';
+        });
+    }
+
+    highlightGreeks() {
+        const greek = document.getElementById('greekHighlight').value;
+        
+        // Remove previous highlights
+        document.querySelectorAll('#optionsChainBody td').forEach(td => {
+            td.classList.remove('greek-highlight-delta', 'greek-highlight-gamma', 'greek-highlight-theta', 'greek-highlight-vega');
+        });
+        
+        if (greek) {
+            const greekColumns = {
+                'delta': [6, 9], // Call delta, Put delta columns
+                'gamma': [7, 8], // Call gamma, Put gamma columns
+                'theta': [], // Would need theta columns
+                'vega': []  // Would need vega columns
+            };
+            
+            if (greekColumns[greek]) {
+                greekColumns[greek].forEach(colIndex => {
+                    document.querySelectorAll(`#optionsChainBody tr td:nth-child(${colIndex + 1})`).forEach(td => {
+                        td.classList.add(`greek-highlight-${greek}`);
+                    });
+                });
+            }
+        }
+    }
+
+    addStrategyLeg() {
+        const container = document.getElementById('strategyLegs');
+        const legIndex = container.children.length;
+        
+        const leg = document.createElement('div');
+        leg.className = 'strategy-leg';
+        leg.innerHTML = `
+            <div class="leg-controls">
+                <select class="leg-type">
+                    <option value="call">Call</option>
+                    <option value="put">Put</option>
+                    <option value="stock">Stock</option>
+                </select>
+                <select class="leg-action">
+                    <option value="buy">Buy</option>
+                    <option value="sell">Sell</option>
+                </select>
+                <input type="number" class="leg-quantity" placeholder="Quantity" value="1" min="1">
+                <input type="number" class="leg-strike" placeholder="Strike" step="0.01">
+                <input type="number" class="leg-premium" placeholder="Premium" step="0.01">
+                <button class="remove-leg">Remove</button>
+            </div>
+        `;
+        
+        container.appendChild(leg);
+        
+        // Bind remove button
+        leg.querySelector('.remove-leg').addEventListener('click', () => {
+            leg.remove();
+        });
+    }
+
+    async analyzeStrategy() {
+        const symbol = document.getElementById('strategySymbol').value.trim().toUpperCase();
+        const expiration = document.getElementById('strategyExpiration').value;
+        
+        if (!symbol || !expiration) {
+            this.showError('Please enter symbol and expiration date');
+            return;
+        }
+        
+        const legs = this.collectStrategyLegs();
+        if (legs.length === 0) {
+            this.showError('Please add at least one strategy leg');
+            return;
+        }
+        
+        this.showLoading(true);
+        try {
+            // Get current stock price
+            const stockResponse = await fetch(`${this.apiBaseUrl}/company-data/${symbol}`);
+            const stockData = await stockResponse.json();
+            const stockPrice = stockData.price || 150; // Default price
+            
+            const response = await fetch(`${this.apiBaseUrl}/analyze-options-strategy`, {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({
+                    legs: legs,
+                    stockPrice: stockPrice,
+                    expirationDate: expiration
+                })
+            });
+            
+            const analysis = await response.json();
+            this.renderStrategyAnalysis(analysis, stockPrice);
+            document.getElementById('strategyAnalysis').style.display = 'block';
+        } catch (error) {
+            console.error('Error analyzing strategy:', error);
+            this.showError('Failed to analyze strategy');
+        } finally {
+            this.showLoading(false);
+        }
+    }
+
+    collectStrategyLegs() {
+        const legs = [];
+        document.querySelectorAll('.strategy-leg').forEach(legElement => {
+            const type = legElement.querySelector('.leg-type').value;
+            const action = legElement.querySelector('.leg-action').value;
+            const quantity = parseInt(legElement.querySelector('.leg-quantity').value) || 1;
+            const strike = parseFloat(legElement.querySelector('.leg-strike').value);
+            const premium = parseFloat(legElement.querySelector('.leg-premium').value);
+            
+            if (type === 'stock' || (strike && premium)) {
+                legs.push({
+                    type: type,
+                    action: action,
+                    quantity: quantity,
+                    strike: strike,
+                    premium: premium,
+                    optionType: type === 'stock' ? null : type
+                });
+            }
+        });
+        return legs;
+    }
+
+    renderStrategyAnalysis(analysis, stockPrice) {
+        // Render metrics
+        document.getElementById('analysisMetrics').innerHTML = `
+            <div class="analysis-metric">
+                <div class="metric-title">Max Profit</div>
+                <div class="metric-number">${analysis.maxProfit}</div>
+            </div>
+            <div class="analysis-metric">
+                <div class="metric-title">Max Loss</div>
+                <div class="metric-number">${analysis.maxLoss}</div>
+            </div>
+            <div class="analysis-metric">
+                <div class="metric-title">Profit Probability</div>
+                <div class="metric-number">${analysis.profitProbability.toFixed(1)}%</div>
+            </div>
+            <div class="analysis-metric">
+                <div class="metric-title">Break-even</div>
+                <div class="metric-number">${analysis.breakevens.length > 0 ? '$' + analysis.breakevens[0].toFixed(2) : 'N/A'}</div>
+            </div>
+        `;
+        
+        // Render Greeks
+        if (analysis.legs.length > 0) {
+            const totalGreeks = this.calculateTotalGreeks(analysis.legs);
+            document.getElementById('greeksAnalysis').innerHTML = `
+                <div class="greek-item">
+                    <div class="greek-name">Delta</div>
+                    <div class="greek-value">${totalGreeks.delta.toFixed(3)}</div>
+                </div>
+                <div class="greek-item">
+                    <div class="greek-name">Gamma</div>
+                    <div class="greek-value">${totalGreeks.gamma.toFixed(4)}</div>
+                </div>
+                <div class="greek-item">
+                    <div class="greek-name">Theta</div>
+                    <div class="greek-value">${totalGreeks.theta.toFixed(2)}</div>
+                </div>
+                <div class="greek-item">
+                    <div class="greek-name">Vega</div>
+                    <div class="greek-value">${totalGreeks.vega.toFixed(2)}</div>
+                </div>
+            `;
+        }
+        
+        // Create P&L diagram
+        this.createPnLDiagram(analysis.legs, stockPrice);
+    }
+
+    calculateTotalGreeks(legs) {
+        let totalDelta = 0, totalGamma = 0, totalTheta = 0, totalVega = 0;
+        
+        legs.forEach(leg => {
+            if (leg.greeks) {
+                const multiplier = leg.action === 'buy' ? 1 : -1;
+                totalDelta += leg.greeks.delta * leg.quantity * multiplier;
+                totalGamma += leg.greeks.gamma * leg.quantity * multiplier;
+                totalTheta += leg.greeks.theta * leg.quantity * multiplier;
+                totalVega += leg.greeks.vega * leg.quantity * multiplier;
+            }
+        });
+        
+        return { delta: totalDelta, gamma: totalGamma, theta: totalTheta, vega: totalVega };
+    }
+
+    createPnLDiagram(legs, currentStockPrice) {
+        const canvas = document.getElementById('pnlChart');
+        const ctx = canvas.getContext('2d');
+        
+        // Generate stock price range
+        const priceRange = currentStockPrice * 0.5; // ±50% of current price
+        const stockPrices = [];
+        const pnlValues = [];
+        
+        for (let i = 0; i <= 100; i++) {
+            const price = currentStockPrice - priceRange + (i / 100) * 2 * priceRange;
+            stockPrices.push(price);
+            
+            let totalPnL = 0;
+            legs.forEach(leg => {
+                if (leg.type === 'stock') {
+                    const stockPnL = leg.action === 'buy' 
+                        ? (price - currentStockPrice) * leg.quantity
+                        : (currentStockPrice - price) * leg.quantity;
+                    totalPnL += stockPnL;
+                } else {
+                    const intrinsicValue = leg.type === 'call' 
+                        ? Math.max(0, price - leg.strike)
+                        : Math.max(0, leg.strike - price);
+                    
+                    const optionPnL = leg.action === 'buy'
+                        ? (intrinsicValue - leg.premium) * leg.quantity * 100
+                        : (leg.premium - intrinsicValue) * leg.quantity * 100;
+                    
+                    totalPnL += optionPnL;
+                }
+            });
+            
+            pnlValues.push(totalPnL);
+        }
+        
+        // Clear canvas
+        ctx.clearRect(0, 0, canvas.width, canvas.height);
+        
+        // Draw axes
+        const margin = 40;
+        const width = canvas.width - 2 * margin;
+        const height = canvas.height - 2 * margin;
+        
+        ctx.beginPath();
+        ctx.moveTo(margin, margin);
+        ctx.lineTo(margin, margin + height);
+        ctx.lineTo(margin + width, margin + height);
+        ctx.strokeStyle = '#374151';
+        ctx.stroke();
+        
+        // Draw P&L line
+        ctx.beginPath();
+        const minPnL = Math.min(...pnlValues);
+        const maxPnL = Math.max(...pnlValues);
+        const pnlRange = maxPnL - minPnL || 1;
+        
+        pnlValues.forEach((pnl, i) => {
+            const x = margin + (i / (pnlValues.length - 1)) * width;
+            const y = margin + height - ((pnl - minPnL) / pnlRange) * height;
+            
+            if (i === 0) {
+                ctx.moveTo(x, y);
+            } else {
+                ctx.lineTo(x, y);
+            }
+        });
+        
+        ctx.strokeStyle = '#4f46e5';
+        ctx.lineWidth = 2;
+        ctx.stroke();
+        
+        // Draw zero line
+        const zeroY = margin + height - ((-minPnL) / pnlRange) * height;
+        ctx.beginPath();
+        ctx.moveTo(margin, zeroY);
+        ctx.lineTo(margin + width, zeroY);
+        ctx.strokeStyle = '#ef4444';
+        ctx.lineWidth = 1;
+        ctx.setLineDash([5, 5]);
+        ctx.stroke();
+        ctx.setLineDash([]);
+        
+        // Draw current price line
+        const currentPriceX = margin + width / 2;
+        ctx.beginPath();
+        ctx.moveTo(currentPriceX, margin);
+        ctx.lineTo(currentPriceX, margin + height);
+        ctx.strokeStyle = '#10b981';
+        ctx.lineWidth = 1;
+        ctx.setLineDash([3, 3]);
+        ctx.stroke();
+        ctx.setLineDash([]);
+    }
+
+    async scanUnusualActivity() {
+        const symbol = document.getElementById('activitySymbol').value.trim().toUpperCase();
+        const type = document.getElementById('activityType').value;
+        const volumeThreshold = document.getElementById('volumeThreshold').value;
+        
+        this.showLoading(true);
+        try {
+            const params = new URLSearchParams();
+            if (symbol) params.append('symbol', symbol);
+            if (type !== 'all') params.append('type', type);
+            params.append('volumeThreshold', volumeThreshold);
+            
+            const response = await fetch(`${this.apiBaseUrl}/unusual-options-activity?${params}`);
+            const data = await response.json();
+            
+            this.renderUnusualActivity(data);
+        } catch (error) {
+            console.error('Error scanning unusual activity:', error);
+            this.showError('Failed to scan unusual activity');
+        } finally {
+            this.showLoading(false);
+        }
+    }
+
+    renderUnusualActivity(data) {
+        const container = document.getElementById('activityResults');
+        
+        if (data.activities.length === 0) {
+            container.innerHTML = '<p>No unusual activity found</p>';
+            return;
+        }
+        
+        container.innerHTML = `
+            <div class="activity-list">
+                ${data.activities.map(activity => `
+                    <div class="activity-item">
+                        <div class="activity-header">
+                            <div class="activity-symbol">${activity.symbol}</div>
+                            <div class="activity-type ${activity.optionType}">${activity.optionType.toUpperCase()}</div>
+                        </div>
+                        <div class="activity-details">
+                            <div class="activity-detail">
+                                <div class="detail-label">Strike</div>
+                                <div class="detail-value">$${activity.strike}</div>
+                            </div>
+                            <div class="activity-detail">
+                                <div class="detail-label">Expiration</div>
+                                <div class="detail-value">${activity.expiration}</div>
+                            </div>
+                            <div class="activity-detail">
+                                <div class="detail-label">Volume</div>
+                                <div class="detail-value">${activity.volume.toLocaleString()}</div>
+                            </div>
+                            <div class="activity-detail">
+                                <div class="detail-label">Volume Ratio</div>
+                                <div class="detail-value volume-ratio">${activity.volumeRatio}x</div>
+                            </div>
+                            <div class="activity-detail">
+                                <div class="detail-label">Price</div>
+                                <div class="detail-value">$${activity.price}</div>
+                            </div>
+                            <div class="activity-detail">
+                                <div class="detail-label">IV</div>
+                                <div class="detail-value">${(activity.impliedVolatility * 100).toFixed(1)}%</div>
+                            </div>
+                        </div>
+                    </div>
+                `).join('')}
+            </div>
+        `;
+    }
+
+    async loadExpirationCalendar() {
+        const symbol = document.getElementById('calendarSymbol').value.trim().toUpperCase();
+        
+        this.showLoading(true);
+        try {
+            const params = symbol ? `?symbol=${symbol}` : '';
+            const response = await fetch(`${this.apiBaseUrl}/options-expiration-calendar${params}`);
+            const data = await response.json();
+            
+            this.renderExpirationCalendar(data);
+        } catch (error) {
+            console.error('Error loading expiration calendar:', error);
+            this.showError('Failed to load expiration calendar');
+        } finally {
+            this.showLoading(false);
+        }
+    }
+
+    renderExpirationCalendar(data) {
+        const container = document.getElementById('calendarGrid');
+        
+        container.innerHTML = data.expirations.map(exp => `
+            <div class="expiration-card">
+                <div class="expiration-header">
+                    <div class="expiration-date">${exp.date}</div>
+                    <div class="days-to-expiry">${exp.daysToExpiry} days</div>
+                </div>
+                <div class="expiration-type">
+                    ${exp.isWeekly ? '<span class="type-badge type-weekly">Weekly</span>' : ''}
+                    ${exp.isMonthly ? '<span class="type-badge type-monthly">Monthly</span>' : ''}
+                    ${exp.isQuarterly ? '<span class="type-badge type-quarterly">Quarterly</span>' : ''}
+                </div>
+                <div class="expiration-metrics">
+                    <div class="metric">
+                        <div class="metric-title">Volume</div>
+                        <div class="metric-value">${exp.totalVolume.toLocaleString()}</div>
+                    </div>
+                    <div class="metric">
+                        <div class="metric-title">Open Interest</div>
+                        <div class="metric-value">${exp.totalOpenInterest.toLocaleString()}</div>
+                    </div>
+                </div>
+                ${exp.events.length > 0 ? `
+                    <div class="expiration-events">
+                        ${exp.events.map(event => `<span class="event-type">${event}</span>`).join('')}
+                    </div>
+                ` : ''}
+            </div>
+        `).join('');
+        
+        // Render upcoming events
+        this.renderUpcomingEvents(data.expirations);
+    }
+
+    renderUpcomingEvents(expirations) {
+        const container = document.getElementById('expirationEvents');
+        const eventsWithDates = [];
+        
+        expirations.forEach(exp => {
+            exp.events.forEach(event => {
+                eventsWithDates.push({
+                    date: exp.date,
+                    daysToExpiry: exp.daysToExpiry,
+                    event: event
+                });
+            });
+        });
+        
+        eventsWithDates.sort((a, b) => a.daysToExpiry - b.daysToExpiry);
+        
+        container.innerHTML = `
+            <div class="event-list">
+                ${eventsWithDates.slice(0, 10).map(item => `
+                    <div class="event-item">
+                        <div class="event-date">${item.date} (${item.daysToExpiry} days)</div>
+                        <div class="event-details">
+                            <span class="event-type">${item.event}</span>
+                        </div>
+                    </div>
+                `).join('')}
+            </div>
+        `;
     }
 }
 

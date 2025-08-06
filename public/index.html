@@ -334,6 +334,250 @@
             </div>
         </section>
 
+        <!-- Options Trading Tools -->
+        <section class="options-trading">
+            <h2><i class="fas fa-chart-bar"></i> Options Trading Tools</h2>
+            
+            <div class="options-tabs">
+                <button class="tab-btn active" data-tab="options-chain">Options Chain</button>
+                <button class="tab-btn" data-tab="strategy-builder">Strategy Builder</button>
+                <button class="tab-btn" data-tab="unusual-activity">Unusual Activity</button>
+                <button class="tab-btn" data-tab="expiration-calendar">Expiration Calendar</button>
+            </div>
+
+            <!-- Options Chain Tab -->
+            <div class="tab-content active" id="options-chain-tab">
+                <div class="options-chain-controls">
+                    <div class="chain-form">
+                        <div class="form-group">
+                            <label for="optionsSymbol">Symbol</label>
+                            <input type="text" id="optionsSymbol" placeholder="AAPL" maxlength="10">
+                        </div>
+                        <div class="form-group">
+                            <label for="optionsExpiration">Expiration</label>
+                            <select id="optionsExpiration">
+                                <!-- Expiration dates will be populated here -->
+                            </select>
+                        </div>
+                        <button id="loadOptionsChainBtn" class="btn btn-primary">
+                            <i class="fas fa-search"></i> Load Chain
+                        </button>
+                    </div>
+                    
+                    <div class="chain-filters">
+                        <label>
+                            <input type="checkbox" id="showITMOnly"> In-the-Money Only
+                        </label>
+                        <label>
+                            <input type="checkbox" id="showHighVolume"> High Volume Only
+                        </label>
+                        <div class="greek-selector">
+                            <label for="greekHighlight">Highlight Greek:</label>
+                            <select id="greekHighlight">
+                                <option value="">None</option>
+                                <option value="delta">Delta</option>
+                                <option value="gamma">Gamma</option>
+                                <option value="theta">Theta</option>
+                                <option value="vega">Vega</option>
+                            </select>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="options-chain-container" id="optionsChainContainer" style="display: none;">
+                    <div class="chain-header">
+                        <h3 id="chainTitle">Options Chain</h3>
+                        <div class="stock-info" id="chainStockInfo">
+                            <!-- Stock info will be populated here -->
+                        </div>
+                    </div>
+                    
+                    <div class="options-table-container">
+                        <div class="options-table-wrapper">
+                            <table class="options-table">
+                                <thead>
+                                    <tr>
+                                        <th colspan="8" class="section-header calls-header">CALLS</th>
+                                        <th class="strike-header">STRIKE</th>
+                                        <th colspan="8" class="section-header puts-header">PUTS</th>
+                                    </tr>
+                                    <tr>
+                                        <th>Bid</th>
+                                        <th>Ask</th>
+                                        <th>Last</th>
+                                        <th>Vol</th>
+                                        <th>OI</th>
+                                        <th>IV</th>
+                                        <th>Delta</th>
+                                        <th>Gamma</th>
+                                        <th class="strike-column">Strike</th>
+                                        <th>Gamma</th>
+                                        <th>Delta</th>
+                                        <th>IV</th>
+                                        <th>OI</th>
+                                        <th>Vol</th>
+                                        <th>Last</th>
+                                        <th>Ask</th>
+                                        <th>Bid</th>
+                                    </tr>
+                                </thead>
+                                <tbody id="optionsChainBody">
+                                    <!-- Options chain data will be populated here -->
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                    
+                    <div class="volatility-analysis">
+                        <h4><i class="fas fa-chart-line"></i> Implied Volatility Analysis</h4>
+                        <div class="iv-metrics" id="ivMetrics">
+                            <!-- IV metrics will be populated here -->
+                        </div>
+                        <div class="iv-chart-container">
+                            <canvas id="ivChart" width="400" height="200"></canvas>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Strategy Builder Tab -->
+            <div class="tab-content" id="strategy-builder-tab">
+                <div class="strategy-builder">
+                    <div class="strategy-templates">
+                        <h3><i class="fas fa-layer-group"></i> Strategy Templates</h3>
+                        <div class="template-grid" id="strategyTemplates">
+                            <!-- Strategy templates will be populated here -->
+                        </div>
+                    </div>
+                    
+                    <div class="custom-strategy">
+                        <h3><i class="fas fa-cogs"></i> Build Custom Strategy</h3>
+                        <div class="strategy-form">
+                            <div class="form-group">
+                                <label for="strategySymbol">Underlying Symbol</label>
+                                <input type="text" id="strategySymbol" placeholder="AAPL" maxlength="10">
+                            </div>
+                            <div class="form-group">
+                                <label for="strategyExpiration">Expiration Date</label>
+                                <select id="strategyExpiration">
+                                    <!-- Will be populated -->
+                                </select>
+                            </div>
+                        </div>
+                        
+                        <div class="strategy-legs">
+                            <h4>Strategy Legs</h4>
+                            <div id="strategyLegs">
+                                <!-- Strategy legs will be added here -->
+                            </div>
+                            <button id="addLegBtn" class="btn btn-secondary">
+                                <i class="fas fa-plus"></i> Add Leg
+                            </button>
+                        </div>
+                        
+                        <button id="analyzeStrategyBtn" class="btn btn-primary">
+                            <i class="fas fa-calculator"></i> Analyze Strategy
+                        </button>
+                    </div>
+                    
+                    <div class="strategy-analysis" id="strategyAnalysis" style="display: none;">
+                        <h3><i class="fas fa-chart-area"></i> Strategy Analysis</h3>
+                        <div class="analysis-metrics" id="analysisMetrics">
+                            <!-- Analysis metrics will be populated here -->
+                        </div>
+                        
+                        <div class="pnl-diagram">
+                            <h4>Profit/Loss Diagram</h4>
+                            <canvas id="pnlChart" width="600" height="300"></canvas>
+                        </div>
+                        
+                        <div class="greek-analysis">
+                            <h4>Greeks Analysis</h4>
+                            <div id="greeksAnalysis">
+                                <!-- Greeks analysis will be populated here -->
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Unusual Activity Tab -->
+            <div class="tab-content" id="unusual-activity-tab">
+                <div class="unusual-activity">
+                    <div class="activity-controls">
+                        <h3><i class="fas fa-exclamation-triangle"></i> Unusual Options Activity</h3>
+                        <div class="activity-filters">
+                            <div class="filter-group">
+                                <label for="activitySymbol">Symbol (optional)</label>
+                                <input type="text" id="activitySymbol" placeholder="All symbols" maxlength="10">
+                            </div>
+                            <div class="filter-group">
+                                <label for="activityType">Option Type</label>
+                                <select id="activityType">
+                                    <option value="all">All</option>
+                                    <option value="calls">Calls Only</option>
+                                    <option value="puts">Puts Only</option>
+                                </select>
+                            </div>
+                            <div class="filter-group">
+                                <label for="volumeThreshold">Min Volume Ratio</label>
+                                <select id="volumeThreshold">
+                                    <option value="2">2x Average</option>
+                                    <option value="3">3x Average</option>
+                                    <option value="5">5x Average</option>
+                                    <option value="10">10x Average</option>
+                                </select>
+                            </div>
+                            <button id="scanActivityBtn" class="btn btn-primary">
+                                <i class="fas fa-search"></i> Scan
+                            </button>
+                        </div>
+                    </div>
+                    
+                    <div class="activity-results" id="activityResults">
+                        <!-- Unusual activity results will be populated here -->
+                    </div>
+                </div>
+            </div>
+
+            <!-- Expiration Calendar Tab -->
+            <div class="tab-content" id="expiration-calendar-tab">
+                <div class="expiration-calendar">
+                    <div class="calendar-controls">
+                        <h3><i class="fas fa-calendar-alt"></i> Options Expiration Calendar</h3>
+                        <div class="calendar-filters">
+                            <div class="filter-group">
+                                <label for="calendarSymbol">Symbol (optional)</label>
+                                <input type="text" id="calendarSymbol" placeholder="All symbols" maxlength="10">
+                            </div>
+                            <div class="filter-group">
+                                <label for="calendarPeriod">Period</label>
+                                <select id="calendarPeriod">
+                                    <option value="30">Next 30 Days</option>
+                                    <option value="60">Next 60 Days</option>
+                                    <option value="90">Next 90 Days</option>
+                                </select>
+                            </div>
+                            <button id="loadCalendarBtn" class="btn btn-primary">
+                                <i class="fas fa-refresh"></i> Load Calendar
+                            </button>
+                        </div>
+                    </div>
+                    
+                    <div class="calendar-grid" id="calendarGrid">
+                        <!-- Calendar will be populated here -->
+                    </div>
+                    
+                    <div class="expiration-events">
+                        <h4><i class="fas fa-bell"></i> Upcoming Events</h4>
+                        <div id="expirationEvents">
+                            <!-- Events will be populated here -->
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
         <!-- Investment Simulator -->
         <section class="investment-simulator">
             <h2><i class="fas fa-calculator"></i> Investment Simulator</h2>
