@@ -7,6 +7,7 @@
     <link rel="stylesheet" href="styles.css">
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 </head>
 <body>
     <div class="container">
@@ -25,14 +26,6 @@
             </div>
         </header>
 
-        <!-- Market Overview -->
-        <section class="market-overview">
-            <h2><i class="fas fa-globe"></i> Market Overview</h2>
-            <div class="indices-grid" id="indicesGrid">
-                <!-- Market indices will be populated here -->
-            </div>
-        </section>
-
         <!-- AI Summary -->
         <section class="ai-summary">
             <h2><i class="fas fa-robot"></i> AI-Generated Daily Summary</h2>
@@ -45,6 +38,42 @@
                 </div>
                 <div class="key-points" id="keyPoints">
                     <!-- Key points will be populated here -->
+                </div>
+            </div>
+        </section>
+
+        <!-- Market Overview -->
+        <section class="market-overview">
+            <h2><i class="fas fa-globe"></i> Market Overview</h2>
+            <div class="indices-grid" id="indicesGrid">
+                <!-- Market indices will be populated here -->
+            </div>
+            
+
+            <!-- Interactive Charts Section -->
+            <div class="charts-section">
+                <div class="charts-header">
+                    <h3><i class="fas fa-chart-line"></i> Market Charts</h3>
+                    <div class="timeframe-controls">
+                        <button class="timeframe-btn active" data-timeframe="1D">1D</button>
+                        <button class="timeframe-btn" data-timeframe="1W">1W</button>
+                        <button class="timeframe-btn" data-timeframe="1M">1M</button>
+                        <button class="timeframe-btn" data-timeframe="1Y">1Y</button>
+                    </div>
+                </div>
+                <div class="charts-grid">
+                    <div class="chart-container">
+                        <div class="chart-title">S&P 500 (SPY)</div>
+                        <canvas id="spyChart" width="400" height="200"></canvas>
+                    </div>
+                    <div class="chart-container">
+                        <div class="chart-title">NASDAQ (QQQ)</div>
+                        <canvas id="qqqChart" width="400" height="200"></canvas>
+                    </div>
+                    <div class="chart-container">
+                        <div class="chart-title">Dow Jones (DIA)</div>
+                        <canvas id="diaChart" width="400" height="200"></canvas>
+                    </div>
                 </div>
             </div>
         </section>
@@ -93,6 +122,372 @@
             <h2><i class="fas fa-star"></i> Major Companies</h2>
             <div class="stocks-grid" id="majorStocksGrid">
                 <!-- Major stocks will be populated here -->
+            </div>
+        </section>
+
+        <!-- Company Search -->
+        <section class="company-search">
+            <h2><i class="fas fa-search"></i> Company Analysis</h2>
+            <div class="search-container">
+                <input type="text" id="companySearchInput" placeholder="Enter stock symbol (e.g., AAPL, MSFT)" maxlength="10">
+                <button id="searchCompanyBtn" class="btn btn-primary">
+                    <i class="fas fa-chart-line"></i> Analyze
+                </button>
+            </div>
+        </section>
+
+        <!-- Company Fundamentals -->
+        <section class="company-fundamentals" id="companyFundamentals" style="display: none;">
+            <div class="fundamentals-header">
+                <h2><i class="fas fa-building"></i> Company Fundamentals</h2>
+                <div class="company-info" id="companyInfo">
+                    <!-- Company basic info will be populated here -->
+                </div>
+            </div>
+            
+            <div class="fundamentals-tabs">
+                <button class="tab-btn active" data-tab="overview">Overview</button>
+                <button class="tab-btn" data-tab="financials">Financials</button>
+                <button class="tab-btn" data-tab="ratios">Ratios</button>
+                <button class="tab-btn" data-tab="analyst">Analyst</button>
+                <button class="tab-btn" data-tab="governance">Governance</button>
+                <button class="tab-btn" data-tab="esg">ESG</button>
+            </div>
+
+            <div class="tab-content active" id="overview-tab">
+                <div class="overview-grid">
+                    <div class="overview-card">
+                        <h3><i class="fas fa-chart-bar"></i> Key Metrics</h3>
+                        <div id="keyMetrics">
+                            <!-- Key metrics will be populated here -->
+                        </div>
+                    </div>
+                    <div class="overview-card">
+                        <h3><i class="fas fa-users"></i> Peer Comparison</h3>
+                        <div id="peerComparison">
+                            <!-- Peer comparison will be populated here -->
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="tab-content" id="financials-tab">
+                <div class="financials-grid">
+                    <div class="financial-card">
+                        <h3><i class="fas fa-file-invoice-dollar"></i> Income Statement</h3>
+                        <div id="incomeStatement">
+                            <!-- Income statement will be populated here -->
+                        </div>
+                    </div>
+                    <div class="financial-card">
+                        <h3><i class="fas fa-balance-scale"></i> Balance Sheet</h3>
+                        <div id="balanceSheet">
+                            <!-- Balance sheet will be populated here -->
+                        </div>
+                    </div>
+                    <div class="financial-card">
+                        <h3><i class="fas fa-hand-holding-usd"></i> Cash Flow</h3>
+                        <div id="cashFlow">
+                            <!-- Cash flow will be populated here -->
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="tab-content" id="ratios-tab">
+                <div class="ratios-grid">
+                    <div class="ratio-category">
+                        <h3><i class="fas fa-percentage"></i> Profitability</h3>
+                        <div id="profitabilityRatios">
+                            <!-- Profitability ratios will be populated here -->
+                        </div>
+                    </div>
+                    <div class="ratio-category">
+                        <h3><i class="fas fa-tint"></i> Liquidity</h3>
+                        <div id="liquidityRatios">
+                            <!-- Liquidity ratios will be populated here -->
+                        </div>
+                    </div>
+                    <div class="ratio-category">
+                        <h3><i class="fas fa-weight-hanging"></i> Leverage</h3>
+                        <div id="leverageRatios">
+                            <!-- Leverage ratios will be populated here -->
+                        </div>
+                    </div>
+                    <div class="ratio-category">
+                        <h3><i class="fas fa-dollar-sign"></i> Valuation</h3>
+                        <div id="valuationRatios">
+                            <!-- Valuation ratios will be populated here -->
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="tab-content" id="analyst-tab">
+                <div class="analyst-grid">
+                    <div class="analyst-card">
+                        <h3><i class="fas fa-star"></i> Analyst Ratings</h3>
+                        <div id="analystRatings">
+                            <!-- Analyst ratings will be populated here -->
+                        </div>
+                    </div>
+                    <div class="analyst-card">
+                        <h3><i class="fas fa-target"></i> Price Targets</h3>
+                        <div id="priceTargets">
+                            <!-- Price targets will be populated here -->
+                        </div>
+                    </div>
+                    <div class="analyst-card">
+                        <h3><i class="fas fa-history"></i> Recent Changes</h3>
+                        <div id="recentChanges">
+                            <!-- Recent analyst changes will be populated here -->
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="tab-content" id="governance-tab">
+                <div class="governance-grid">
+                    <div class="governance-card">
+                        <h3><i class="fas fa-user-tie"></i> Executive Compensation</h3>
+                        <div id="executiveComp">
+                            <!-- Executive compensation will be populated here -->
+                        </div>
+                    </div>
+                    <div class="governance-card">
+                        <h3><i class="fas fa-exchange-alt"></i> Insider Trading</h3>
+                        <div id="insiderTrading">
+                            <!-- Insider trading will be populated here -->
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="tab-content" id="esg-tab">
+                <div class="esg-grid">
+                    <div class="esg-card">
+                        <h3><i class="fas fa-leaf"></i> ESG Overview</h3>
+                        <div id="esgOverview">
+                            <!-- ESG overview will be populated here -->
+                        </div>
+                    </div>
+                    <div class="esg-card">
+                        <h3><i class="fas fa-chart-pie"></i> ESG Breakdown</h3>
+                        <div id="esgBreakdown">
+                            <!-- ESG breakdown will be populated here -->
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- News & Sentiment -->
+        <section class="news-sentiment">
+            <h2><i class="fas fa-newspaper"></i> News & Sentiment Analysis</h2>
+            
+            <div class="news-tabs">
+                <button class="tab-btn active" data-tab="market-news">Market News</button>
+                <button class="tab-btn" data-tab="company-news" id="companyNewsTab" style="display: none;">Company News</button>
+                <button class="tab-btn" data-tab="sentiment" id="sentimentTab" style="display: none;">Sentiment</button>
+            </div>
+
+            <div class="tab-content active" id="market-news-tab">
+                <div class="news-filters">
+                    <select id="newsCategory">
+                        <option value="general">All Categories</option>
+                        <option value="earnings">Earnings</option>
+                        <option value="technology">Technology</option>
+                        <option value="monetary-policy">Monetary Policy</option>
+                        <option value="commodities">Commodities</option>
+                    </select>
+                    <button id="refreshNewsBtn" class="btn btn-secondary">
+                        <i class="fas fa-sync-alt"></i> Refresh
+                    </button>
+                </div>
+                <div class="news-summary" id="newsSummary">
+                    <!-- News summary will be populated here -->
+                </div>
+                <div class="news-list" id="marketNewsList">
+                    <!-- Market news will be populated here -->
+                </div>
+            </div>
+
+            <div class="tab-content" id="company-news-tab">
+                <div class="company-news-header" id="companyNewsHeader">
+                    <!-- Company news header will be populated here -->
+                </div>
+                <div class="news-list" id="companyNewsList">
+                    <!-- Company news will be populated here -->
+                </div>
+            </div>
+
+            <div class="tab-content" id="sentiment-tab">
+                <div class="sentiment-overview" id="sentimentOverview">
+                    <!-- Sentiment overview will be populated here -->
+                </div>
+                <div class="sentiment-breakdown" id="sentimentBreakdown">
+                    <!-- Sentiment breakdown will be populated here -->
+                </div>
+                <div class="sentiment-trends" id="sentimentTrends">
+                    <!-- Sentiment trends will be populated here -->
+                </div>
+            </div>
+        </section>
+
+        <!-- Investment Simulator -->
+        <section class="investment-simulator">
+            <h2><i class="fas fa-calculator"></i> Investment Simulator</h2>
+            
+            <div class="simulator-tabs">
+                <button class="tab-btn active" data-tab="future-projection">Future Projection</button>
+                <button class="tab-btn" data-tab="historical-whatif">Historical What-If</button>
+                <button class="tab-btn" data-tab="portfolio-simulation">Portfolio Simulation</button>
+            </div>
+
+            <!-- Future Projection Tab -->
+            <div class="tab-content active" id="future-projection-tab">
+                <div class="simulation-form">
+                    <h3><i class="fas fa-chart-line"></i> Future Investment Projection</h3>
+                    <p>See how your investment might grow over time</p>
+                    
+                    <div class="form-grid">
+                        <div class="form-group">
+                            <label for="futureAmount">Investment Amount ($)</label>
+                            <input type="number" id="futureAmount" placeholder="1000" min="1" step="0.01">
+                        </div>
+                        <div class="form-group">
+                            <label for="futureSymbol">Stock/Asset</label>
+                            <select id="futureSymbol">
+                                <option value="AAPL">Apple (AAPL)</option>
+                                <option value="MSFT">Microsoft (MSFT)</option>
+                                <option value="GOOGL">Google (GOOGL)</option>
+                                <option value="AMZN">Amazon (AMZN)</option>
+                                <option value="TSLA">Tesla (TSLA)</option>
+                                <option value="SPY">S&P 500 (SPY)</option>
+                                <option value="QQQ">NASDAQ (QQQ)</option>
+                                <option value="moderate">Moderate Portfolio</option>
+                                <option value="aggressive">Aggressive Portfolio</option>
+                            </select>
+                        </div>
+                        <div class="form-group">
+                            <label for="futureDays">Time Horizon (Days)</label>
+                            <input type="number" id="futureDays" placeholder="365" min="1" max="3650">
+                        </div>
+                        <div class="form-group">
+                            <label for="confidenceLevel">Confidence Level</label>
+                            <select id="confidenceLevel">
+                                <option value="0.68">68% (1 Std Dev)</option>
+                                <option value="0.95">95% (2 Std Dev)</option>
+                                <option value="0.99">99% (3 Std Dev)</option>
+                            </select>
+                        </div>
+                    </div>
+                    
+                    <button id="simulateFutureBtn" class="btn btn-primary">
+                        <i class="fas fa-play"></i> Run Simulation
+                    </button>
+                </div>
+                
+                <div class="simulation-results" id="futureResults" style="display: none;">
+                    <!-- Future projection results will be populated here -->
+                </div>
+            </div>
+
+            <!-- Historical What-If Tab -->
+            <div class="tab-content" id="historical-whatif-tab">
+                <div class="simulation-form">
+                    <h3><i class="fas fa-history"></i> Historical "What If" Analysis</h3>
+                    <p>See what your investment would be worth today if you invested in the past</p>
+                    
+                    <div class="form-grid">
+                        <div class="form-group">
+                            <label for="historicalAmount">Investment Amount ($)</label>
+                            <input type="number" id="historicalAmount" placeholder="1000" min="1" step="0.01">
+                        </div>
+                        <div class="form-group">
+                            <label for="historicalSymbol">Stock/Asset</label>
+                            <select id="historicalSymbol">
+                                <option value="AAPL">Apple (AAPL)</option>
+                                <option value="MSFT">Microsoft (MSFT)</option>
+                                <option value="GOOGL">Google (GOOGL)</option>
+                                <option value="AMZN">Amazon (AMZN)</option>
+                                <option value="TSLA">Tesla (TSLA)</option>
+                                <option value="SPY">S&P 500 (SPY)</option>
+                                <option value="QQQ">NASDAQ (QQQ)</option>
+                            </select>
+                        </div>
+                        <div class="form-group">
+                            <label for="daysAgo">Days Ago</label>
+                            <select id="daysAgo">
+                                <option value="30">1 Month Ago</option>
+                                <option value="90">3 Months Ago</option>
+                                <option value="180">6 Months Ago</option>
+                                <option value="365">1 Year Ago</option>
+                                <option value="730">2 Years Ago</option>
+                                <option value="1095">3 Years Ago</option>
+                                <option value="1825">5 Years Ago</option>
+                            </select>
+                        </div>
+                    </div>
+                    
+                    <button id="simulateHistoricalBtn" class="btn btn-primary">
+                        <i class="fas fa-search"></i> Calculate What-If
+                    </button>
+                </div>
+                
+                <div class="simulation-results" id="historicalResults" style="display: none;">
+                    <!-- Historical what-if results will be populated here -->
+                </div>
+            </div>
+
+            <!-- Portfolio Simulation Tab -->
+            <div class="tab-content" id="portfolio-simulation-tab">
+                <div class="simulation-form">
+                    <h3><i class="fas fa-pie-chart"></i> Portfolio Simulation</h3>
+                    <p>Simulate a diversified portfolio with multiple assets</p>
+                    
+                    <div class="form-grid">
+                        <div class="form-group full-width">
+                            <label for="portfolioAmount">Total Investment Amount ($)</label>
+                            <input type="number" id="portfolioAmount" placeholder="10000" min="1" step="0.01">
+                        </div>
+                        <div class="form-group full-width">
+                            <label for="portfolioDays">Investment Horizon (Days)</label>
+                            <input type="number" id="portfolioDays" placeholder="365" min="1" max="3650">
+                        </div>
+                    </div>
+                    
+                    <div class="portfolio-builder">
+                        <h4>Portfolio Allocation</h4>
+                        <div id="portfolioAllocations">
+                            <div class="allocation-item">
+                                <select class="asset-select">
+                                    <option value="AAPL">Apple (AAPL)</option>
+                                    <option value="MSFT">Microsoft (MSFT)</option>
+                                    <option value="GOOGL">Google (GOOGL)</option>
+                                    <option value="SPY">S&P 500 (SPY)</option>
+                                </select>
+                                <input type="number" class="allocation-percent" placeholder="25" min="0" max="100" step="0.1">
+                                <span>%</span>
+                                <button class="remove-allocation btn btn-secondary">Remove</button>
+                            </div>
+                        </div>
+                        <button id="addAllocationBtn" class="btn btn-secondary">
+                            <i class="fas fa-plus"></i> Add Asset
+                        </button>
+                        <div class="allocation-total">
+                            Total: <span id="totalAllocation">0</span>%
+                        </div>
+                    </div>
+                    
+                    <button id="simulatePortfolioBtn" class="btn btn-primary">
+                        <i class="fas fa-chart-pie"></i> Simulate Portfolio
+                    </button>
+                </div>
+                
+                <div class="simulation-results" id="portfolioResults" style="display: none;">
+                    <!-- Portfolio simulation results will be populated here -->
+                </div>
             </div>
         </section>
 
