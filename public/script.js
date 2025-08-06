@@ -389,7 +389,413 @@ class StockMarketApp {
     }
 }
 
+// Options Trading Class
+class OptionsTrading {
+    constructor() {
+        this.apiBaseUrl = '/api/options';
+        this.currentSymbol = '';
+        this.currentExpiration = '';
+        this.optionsData = null;
+        this.init();
+    }
+
+    init() {
+        this.bindEventListeners();
+        this.loadExpirationCalendar();
+        this.loadUnusualActivity();
+    }
+
+    bindEventListeners() {
+        // Options navigation
+        document.querySelectorAll('.nav-btn').forEach(btn => {
+            btn.addEventListener('click', (e) => {
+                this.switchTab(e.target.dataset.tab);
+            });
+        });
+
+        // Options chain controls
+        document.getElementById('loadOptionsBtn').addEventListener('click', () => {
+            this.loadOptionsChain();
+        });
+
+        document.getElementById('optionsSymbol').addEventListener('keypress', (e) => {
+            if (e.key === 'Enter') {
+                this.loadOptionsChain();
+            }
+        });
+
+        document.getElementById('expirationDate').addEventListener('change', () => {
+            if (this.currentSymbol) {
+                this.loadOptionsChain();
+            }
+        });
+
+        // Strategy builder
+        document.getElementById('strategyType').addEventListener('change', (e) => {
+            this.loadStrategyBuilder(e.target.value);
+        });
+
+        // IV Analysis
+        document.getElementById('analyzeIVBtn').addEventListener('click', () => {
+            this.analyzeImpliedVolatility();
+        });
+
+        // Calendar filters
+        document.querySelectorAll('.filter-btn').forEach(btn => {
+            btn.addEventListener('click', (e) => {
+                this.filterCalendar(e.target.dataset.filter);
+            });
+        });
+    }
+
+    switchTab(tabName) {
+        // Remove active class from all tabs and buttons
+        document.querySelectorAll('.nav-btn').forEach(btn => btn.classList.remove('active'));
+        document.querySelectorAll('.options-tab').forEach(tab => tab.classList.remove('active'));
+
+        // Add active class to selected tab and button
+        document.querySelector(`[data-tab="${tabName}"]`).classList.add('active');
+        document.getElementById(`${tabName}-tab`).classList.add('active');
+    }
+
+    async loadOptionsChain() {
+        const symbol = document.getElementById('optionsSymbol').value.trim().toUpperCase();
+        const expiration = document.getElementById('expirationDate').value;
+
+        if (!symbol) {
+            this.showToast('Please enter a symbol');
+            return;
+        }
+
+        this.currentSymbol = symbol;
+        this.currentExpiration = expiration;
+
+        try {
+            const response = await fetch(`${this.apiBaseUrl}/chain/${symbol}?expiration=${expiration}`);
+            const data = await response.json();
+
+            this.optionsData = data;
+            this.displayOptionsChain(data);
+        } catch (error) {
+            console.error('Error loading options chain:', error);
+            this.showToast('Error loading options chain');
+        }
+    }
+
+    displayOptionsChain(data) {
+        // Display stock info
+        const stockInfo = document.getElementById('stockInfo');
+        stockInfo.innerHTML = `
+            <div>
+                <h3>${data.symbol}</h3>
+                <p>Stock Price: <strong>$${data.stockPrice.toFixed(2)}</strong></p>
+            </div>
+            <div>
+                <p>Expiration: <strong>${new Date(data.expiration).toLocaleDateString()}</strong></p>
+                <p>Updated: <strong>${new Date(data.timestamp).toLocaleTimeString()}</strong></p>
+            </div>
+        `;
+
+        // Display options chain table
+        const tbody = document.getElementById('optionsChainBody');
+        tbody.innerHTML = '';
+
+        const strikes = [...new Set([
+            ...data.chain.calls.map(c => c.strike),
+            ...data.chain.puts.map(p => p.strike)
+        ])].sort((a, b) => a - b);
+
+        strikes.forEach(strike => {
+            const call = data.chain.calls.find(c => c.strike === strike);
+            const put = data.chain.puts.find(p => p.strike === strike);
+
+            const row = document.createElement('tr');
+            row.innerHTML = `
+                <td class="call-data">${call ? call.bid.toFixed(2) : '-'}</td>
+                <td class="call-data">${call ? call.ask.toFixed(2) : '-'}</td>
+                <td class="call-data">${call ? call.last.toFixed(2) : '-'}</td>
+                <td class="call-data">${call ? call.volume.toLocaleString() : '-'}</td>
+                <td class="call-data">${call ? call.openInterest.toLocaleString() : '-'}</td>
+                <td class="call-data">${call ? (call.impliedVolatility * 100).toFixed(1) + '%' : '-'}</td>
+                <td class="call-data">${call ? call.delta.toFixed(3) : '-'}</td>
+                <td class="call-data">${call ? call.gamma.toFixed(3) : '-'}</td>
+                <td class="strike-cell">$${strike}</td>
+                <td class="put-data">${put ? put.gamma.toFixed(3) : '-'}</td>
+                <td class="put-data">${put ? put.delta.toFixed(3) : '-'}</td>
+                <td class="put-data">${put ? (put.impliedVolatility * 100).toFixed(1) + '%' : '-'}</td>
+                <td class="put-data">${put ? put.openInterest.toLocaleString() : '-'}</td>
+                <td class="put-data">${put ? put.volume.toLocaleString() : '-'}</td>
+                <td class="put-data">${put ? put.last.toFixed(2) : '-'}</td>
+                <td class="put-data">${put ? put.ask.toFixed(2) : '-'}</td>
+                <td class="put-data">${put ? put.bid.toFixed(2) : '-'}</td>
+            `;
+
+            // Highlight ITM options
+            if (strike < data.stockPrice) {
+                row.querySelector('.strike-cell').style.background = 'rgba(40, 167, 69, 0.1)';
+                row.querySelectorAll('.call-data').forEach(cell => {
+                    cell.style.background = 'rgba(40, 167, 69, 0.05)';
+                    cell.style.fontWeight = '600';
+                });
+            } else if (strike > data.stockPrice) {
+                row.querySelector('.strike-cell').style.background = 'rgba(220, 53, 69, 0.1)';
+                row.querySelectorAll('.put-data').forEach(cell => {
+                    cell.style.background = 'rgba(220, 53, 69, 0.05)';
+                    cell.style.fontWeight = '600';
+                });
+            } else {
+                row.querySelector('.strike-cell').style.background = 'rgba(255, 193, 7, 0.2)';
+                row.querySelector('.strike-cell').style.fontWeight = '700';
+            }
+
+            tbody.appendChild(row);
+        });
+    }
+
+    async loadExpirationCalendar() {
+        try {
+            const response = await fetch(`${this.apiBaseUrl}/expirations`);
+            const data = await response.json();
+
+            // Populate expiration dropdown
+            const select = document.getElementById('expirationDate');
+            select.innerHTML = '<option value="">Select expiration...</option>';
+            data.dates.forEach(date => {
+                const option = document.createElement('option');
+                option.value = date;
+                option.textContent = new Date(date).toLocaleDateString();
+                select.appendChild(option);
+            });
+
+            // Display calendar
+            this.displayExpirationCalendar(data);
+        } catch (error) {
+            console.error('Error loading expiration calendar:', error);
+        }
+    }
+
+    displayExpirationCalendar(data) {
+        const grid = document.getElementById('calendarGrid');
+        grid.innerHTML = '';
+
+        data.dates.slice(0, 12).forEach(date => {
+            const dateObj = new Date(date);
+            const item = document.createElement('div');
+            item.className = 'calendar-item';
+            
+            const dayOfWeek = dateObj.toLocaleDateString('en-US', { weekday: 'short' });
+            const month = dateObj.toLocaleDateString('en-US', { month: 'short' });
+            const day = dateObj.getDate();
+
+            // Determine if it's monthly or weekly
+            const isMonthly = data.monthlyExpirations.includes(date);
+            const isQuarterly = data.quarterlyExpirations.includes(date);
+
+            item.innerHTML = `
+                <div class="calendar-date">${month} ${day}</div>
+                <div class="calendar-day">${dayOfWeek}</div>
+                <div class="calendar-type">${isQuarterly ? 'Quarterly' : isMonthly ? 'Monthly' : 'Weekly'}</div>
+            `;
+
+            item.addEventListener('click', () => {
+                document.getElementById('expirationDate').value = date;
+                if (this.currentSymbol) {
+                    this.loadOptionsChain();
+                }
+                this.switchTab('chain');
+            });
+
+            grid.appendChild(item);
+        });
+    }
+
+    filterCalendar(filter) {
+        // Update active filter button
+        document.querySelectorAll('.filter-btn').forEach(btn => btn.classList.remove('active'));
+        document.querySelector(`[data-filter="${filter}"]`).classList.add('active');
+
+        // This would filter the calendar display based on the filter type
+        // For now, we'll just reload the calendar
+        this.loadExpirationCalendar();
+    }
+
+    async loadUnusualActivity() {
+        try {
+            const response = await fetch(`${this.apiBaseUrl}/unusual-activity`);
+            const data = await response.json();
+
+            this.displayUnusualActivity(data);
+        } catch (error) {
+            console.error('Error loading unusual activity:', error);
+        }
+    }
+
+    displayUnusualActivity(data) {
+        // High Volume
+        const highVolumeList = document.getElementById('highVolumeList');
+        highVolumeList.innerHTML = '';
+        data.highVolume.forEach(item => {
+            const div = document.createElement('div');
+            div.className = 'activity-item';
+            div.innerHTML = `
+                <div class="activity-header">
+                    <span class="activity-symbol">${item.symbol}</span>
+                    <span class="activity-type ${item.type}-type">${item.type}</span>
+                </div>
+                <div class="activity-details">
+                    <div class="activity-detail">
+                        <div class="label">Strike</div>
+                        <div class="value">$${item.strike}</div>
+                    </div>
+                    <div class="activity-detail">
+                        <div class="label">Volume</div>
+                        <div class="value">${item.volume.toLocaleString()}</div>
+                    </div>
+                    <div class="activity-detail">
+                        <div class="label">Ratio</div>
+                        <div class="value">${item.ratio.toFixed(1)}x</div>
+                    </div>
+                    <div class="activity-detail">
+                        <div class="label">Price</div>
+                        <div class="value">$${item.price.toFixed(2)}</div>
+                    </div>
+                </div>
+            `;
+            highVolumeList.appendChild(div);
+        });
+
+        // High IV
+        const highIVList = document.getElementById('highIVList');
+        highIVList.innerHTML = '';
+        data.highIV.forEach(item => {
+            const div = document.createElement('div');
+            div.className = 'activity-item';
+            div.innerHTML = `
+                <div class="activity-header">
+                    <span class="activity-symbol">${item.symbol}</span>
+                    <span class="activity-type ${item.type}-type">${item.type}</span>
+                </div>
+                <div class="activity-details">
+                    <div class="activity-detail">
+                        <div class="label">Strike</div>
+                        <div class="value">$${item.strike}</div>
+                    </div>
+                    <div class="activity-detail">
+                        <div class="label">IV</div>
+                        <div class="value">${(item.impliedVolatility * 100).toFixed(1)}%</div>
+                    </div>
+                    <div class="activity-detail">
+                        <div class="label">IV Rank</div>
+                        <div class="value">${item.ivRank}</div>
+                    </div>
+                </div>
+            `;
+            highIVList.appendChild(div);
+        });
+
+        // Large Orders
+        const largeOrdersList = document.getElementById('largeOrdersList');
+        largeOrdersList.innerHTML = '';
+        data.largeOrders.forEach(item => {
+            const div = document.createElement('div');
+            div.className = 'activity-item';
+            div.innerHTML = `
+                <div class="activity-header">
+                    <span class="activity-symbol">${item.symbol}</span>
+                    <span class="activity-type ${item.type}-type">${item.type}</span>
+                </div>
+                <div class="activity-details">
+                    <div class="activity-detail">
+                        <div class="label">Strike</div>
+                        <div class="value">$${item.strike}</div>
+                    </div>
+                    <div class="activity-detail">
+                        <div class="label">Size</div>
+                        <div class="value">${item.orderSize.toLocaleString()}</div>
+                    </div>
+                    <div class="activity-detail">
+                        <div class="label">Direction</div>
+                        <div class="value">${item.direction}</div>
+                    </div>
+                    <div class="activity-detail">
+                        <div class="label">Price</div>
+                        <div class="value">$${item.price.toFixed(2)}</div>
+                    </div>
+                </div>
+            `;
+            largeOrdersList.appendChild(div);
+        });
+    }
+
+    loadStrategyBuilder(strategy) {
+        // This would load the strategy builder interface
+        // For now, we'll show a simple message
+        const strategyLegs = document.getElementById('strategyLegs');
+        strategyLegs.innerHTML = `
+            <p>Strategy Builder for <strong>${strategy.replace('_', ' ')}</strong> will be implemented here.</p>
+            <p>This would include:</p>
+            <ul>
+                <li>Leg configuration (buy/sell, strike prices, quantities)</li>
+                <li>Real-time P&L calculation</li>
+                <li>Risk metrics (max profit, max loss, breakevens)</li>
+                <li>Interactive P&L diagram</li>
+            </ul>
+        `;
+
+        // Update metrics with example data
+        document.getElementById('maxProfit').textContent = '$1,250';
+        document.getElementById('maxLoss').textContent = '$750';
+        document.getElementById('breakeven').textContent = '$152.50';
+    }
+
+    analyzeImpliedVolatility() {
+        const symbol = document.getElementById('ivSymbol').value.trim().toUpperCase();
+        
+        if (!symbol) {
+            this.showToast('Please enter a symbol');
+            return;
+        }
+
+        // Update IV metrics with example data
+        document.getElementById('currentIV').textContent = '28.5%';
+        document.getElementById('ivRank').textContent = '75';
+        document.getElementById('ivPercentile').textContent = '82%';
+
+        this.showToast(`IV analysis loaded for ${symbol}`);
+    }
+
+    showToast(message) {
+        const toast = document.createElement('div');
+        toast.style.cssText = `
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            background: linear-gradient(135deg, #667eea, #764ba2);
+            color: white;
+            padding: 15px 25px;
+            border-radius: 10px;
+            box-shadow: 0 8px 25px rgba(0,0,0,0.3);
+            z-index: 3000;
+            font-weight: 500;
+            animation: slideIn 0.3s ease;
+        `;
+        toast.textContent = message;
+        
+        document.body.appendChild(toast);
+        
+        setTimeout(() => {
+            toast.style.animation = 'slideIn 0.3s ease reverse';
+            setTimeout(() => {
+                if (toast.parentNode) {
+                    toast.parentNode.removeChild(toast);
+                }
+            }, 300);
+        }, 3000);
+    }
+}
+
 // Initialize the app when the DOM is loaded
 document.addEventListener('DOMContentLoaded', () => {
     new StockMarketApp();
+    new OptionsTrading();
 });

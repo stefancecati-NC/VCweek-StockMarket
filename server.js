@@ -6,6 +6,7 @@ require('dotenv').config();
 
 const stockService = require('./services/stockService');
 const aiService = require('./services/aiService');
+const optionsService = require('./services/optionsService');
 
 const app = express();
 const PORT = process.env.PORT || 3000;
@@ -79,6 +80,70 @@ app.post('/api/refresh-summary', async (req, res) => {
     } catch (error) {
         console.error('Error refreshing summary:', error);
         res.status(500).json({ error: 'Failed to refresh summary' });
+    }
+});
+
+// Options Trading API Endpoints
+app.get('/api/options/chain/:symbol', async (req, res) => {
+    try {
+        const { symbol } = req.params;
+        const { expiration } = req.query;
+        const chain = await optionsService.getOptionsChain(symbol.toUpperCase(), expiration);
+        res.json(chain);
+    } catch (error) {
+        console.error('Error fetching options chain:', error);
+        res.status(500).json({ error: 'Failed to fetch options chain' });
+    }
+});
+
+app.get('/api/options/expirations', async (req, res) => {
+    try {
+        const calendar = optionsService.getExpirationCalendar();
+        res.json(calendar);
+    } catch (error) {
+        console.error('Error fetching expiration calendar:', error);
+        res.status(500).json({ error: 'Failed to fetch expiration calendar' });
+    }
+});
+
+app.post('/api/options/strategy', async (req, res) => {
+    try {
+        const { strategy, legs, stockPrice } = req.body;
+        const result = optionsService.calculateStrategy(strategy, legs, stockPrice);
+        res.json(result);
+    } catch (error) {
+        console.error('Error calculating strategy:', error);
+        res.status(500).json({ error: 'Failed to calculate strategy' });
+    }
+});
+
+app.get('/api/options/unusual-activity', async (req, res) => {
+    try {
+        const activity = await optionsService.getUnusualActivity();
+        res.json(activity);
+    } catch (error) {
+        console.error('Error fetching unusual activity:', error);
+        res.status(500).json({ error: 'Failed to fetch unusual activity' });
+    }
+});
+
+app.get('/api/options/greeks/:symbol/:strike/:expiration/:type', async (req, res) => {
+    try {
+        const { symbol, strike, expiration, type } = req.params;
+        const stockPrice = await optionsService.getStockPrice(symbol.toUpperCase());
+        const timeToExpiry = optionsService.calculateTimeToExpiry(expiration);
+        const greeks = optionsService.calculateGreeks(
+            stockPrice, 
+            parseFloat(strike), 
+            timeToExpiry, 
+            0.05, // risk-free rate
+            0.25, // implied volatility (placeholder)
+            type
+        );
+        res.json(greeks);
+    } catch (error) {
+        console.error('Error calculating Greeks:', error);
+        res.status(500).json({ error: 'Failed to calculate Greeks' });
     }
 });
 

@@ -88,6 +88,198 @@
             </div>
         </section>
 
+        <!-- Options Trading Tools -->
+        <section class="options-trading" id="optionsSection">
+            <h2><i class="fas fa-coins"></i> Options Trading Tools</h2>
+            
+            <!-- Options Navigation -->
+            <div class="options-nav">
+                <button class="nav-btn active" data-tab="chain">Options Chain</button>
+                <button class="nav-btn" data-tab="strategies">Strategy Builder</button>
+                <button class="nav-btn" data-tab="unusual">Unusual Activity</button>
+                <button class="nav-btn" data-tab="calendar">Expiration Calendar</button>
+                <button class="nav-btn" data-tab="analysis">IV Analysis</button>
+            </div>
+
+            <!-- Options Chain Tab -->
+            <div class="options-tab active" id="chain-tab">
+                <div class="options-controls">
+                    <div class="symbol-input">
+                        <label for="optionsSymbol">Symbol:</label>
+                        <input type="text" id="optionsSymbol" placeholder="e.g., AAPL" maxlength="10">
+                        <button id="loadOptionsBtn" class="btn btn-primary">Load Chain</button>
+                    </div>
+                    <div class="expiration-select">
+                        <label for="expirationDate">Expiration:</label>
+                        <select id="expirationDate">
+                            <option value="">Loading...</option>
+                        </select>
+                    </div>
+                </div>
+                
+                <div class="options-chain-container" id="optionsChainContainer">
+                    <div class="stock-info" id="stockInfo">
+                        <!-- Stock price info will be displayed here -->
+                    </div>
+                    
+                    <div class="options-chain-table">
+                        <table class="options-table">
+                            <thead>
+                                <tr>
+                                    <th colspan="8" class="calls-header">CALLS</th>
+                                    <th class="strike-header">STRIKE</th>
+                                    <th colspan="8" class="puts-header">PUTS</th>
+                                </tr>
+                                <tr>
+                                    <th>Bid</th>
+                                    <th>Ask</th>
+                                    <th>Last</th>
+                                    <th>Vol</th>
+                                    <th>OI</th>
+                                    <th>IV</th>
+                                    <th>Delta</th>
+                                    <th>Gamma</th>
+                                    <th>Strike</th>
+                                    <th>Gamma</th>
+                                    <th>Delta</th>
+                                    <th>IV</th>
+                                    <th>OI</th>
+                                    <th>Vol</th>
+                                    <th>Last</th>
+                                    <th>Ask</th>
+                                    <th>Bid</th>
+                                </tr>
+                            </thead>
+                            <tbody id="optionsChainBody">
+                                <!-- Options chain data will be populated here -->
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Strategy Builder Tab -->
+            <div class="options-tab" id="strategies-tab">
+                <div class="strategy-builder">
+                    <div class="strategy-selector">
+                        <label for="strategyType">Strategy:</label>
+                        <select id="strategyType">
+                            <option value="covered_call">Covered Call</option>
+                            <option value="protective_put">Protective Put</option>
+                            <option value="bull_call_spread">Bull Call Spread</option>
+                            <option value="bear_put_spread">Bear Put Spread</option>
+                            <option value="iron_condor">Iron Condor</option>
+                            <option value="butterfly">Butterfly</option>
+                            <option value="straddle">Long Straddle</option>
+                            <option value="strangle">Long Strangle</option>
+                        </select>
+                    </div>
+                    
+                    <div class="strategy-legs" id="strategyLegs">
+                        <!-- Strategy legs will be populated based on selection -->
+                    </div>
+                    
+                    <div class="strategy-analysis" id="strategyAnalysis">
+                        <div class="strategy-metrics">
+                            <div class="metric">
+                                <label>Max Profit:</label>
+                                <span id="maxProfit">-</span>
+                            </div>
+                            <div class="metric">
+                                <label>Max Loss:</label>
+                                <span id="maxLoss">-</span>
+                            </div>
+                            <div class="metric">
+                                <label>Breakeven:</label>
+                                <span id="breakeven">-</span>
+                            </div>
+                        </div>
+                        
+                        <div class="pnl-chart">
+                            <canvas id="pnlChart" width="600" height="300"></canvas>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Unusual Activity Tab -->
+            <div class="options-tab" id="unusual-tab">
+                <div class="unusual-activity">
+                    <div class="activity-section">
+                        <h3><i class="fas fa-volume-up"></i> High Volume</h3>
+                        <div class="activity-list" id="highVolumeList">
+                            <!-- High volume options will be populated here -->
+                        </div>
+                    </div>
+                    
+                    <div class="activity-section">
+                        <h3><i class="fas fa-exclamation"></i> High Implied Volatility</h3>
+                        <div class="activity-list" id="highIVList">
+                            <!-- High IV options will be populated here -->
+                        </div>
+                    </div>
+                    
+                    <div class="activity-section">
+                        <h3><i class="fas fa-money-bill-wave"></i> Large Orders</h3>
+                        <div class="activity-list" id="largeOrdersList">
+                            <!-- Large orders will be populated here -->
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Expiration Calendar Tab -->
+            <div class="options-tab" id="calendar-tab">
+                <div class="expiration-calendar">
+                    <div class="calendar-controls">
+                        <button class="filter-btn active" data-filter="all">All Dates</button>
+                        <button class="filter-btn" data-filter="weekly">Weekly</button>
+                        <button class="filter-btn" data-filter="monthly">Monthly</button>
+                        <button class="filter-btn" data-filter="quarterly">Quarterly</button>
+                    </div>
+                    
+                    <div class="calendar-grid" id="calendarGrid">
+                        <!-- Expiration dates will be populated here -->
+                    </div>
+                </div>
+            </div>
+
+            <!-- IV Analysis Tab -->
+            <div class="options-tab" id="analysis-tab">
+                <div class="iv-analysis">
+                    <div class="analysis-controls">
+                        <input type="text" id="ivSymbol" placeholder="Symbol (e.g., AAPL)">
+                        <button id="analyzeIVBtn" class="btn btn-primary">Analyze</button>
+                    </div>
+                    
+                    <div class="iv-charts">
+                        <div class="iv-chart">
+                            <h4>Implied Volatility Smile</h4>
+                            <canvas id="ivSmileChart" width="400" height="250"></canvas>
+                        </div>
+                        
+                        <div class="iv-chart">
+                            <h4>IV Rank & Percentile</h4>
+                            <div class="iv-metrics">
+                                <div class="iv-metric">
+                                    <label>Current IV:</label>
+                                    <span id="currentIV">-</span>
+                                </div>
+                                <div class="iv-metric">
+                                    <label>IV Rank:</label>
+                                    <span id="ivRank">-</span>
+                                </div>
+                                <div class="iv-metric">
+                                    <label>IV Percentile:</label>
+                                    <span id="ivPercentile">-</span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
         <!-- Major Stocks -->
         <section class="major-stocks">
             <h2><i class="fas fa-star"></i> Major Companies</h2>
