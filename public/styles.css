@@ -2225,3 +2225,729 @@ section h2 i {
         grid-template-columns: 1fr;
     }
 }
+
+/* Options Trading Tools Styles */
+.options-trading {
+    background: rgba(255, 255, 255, 0.95);
+    backdrop-filter: blur(10px);
+    border-radius: 20px;
+    padding: 30px;
+    margin-bottom: 30px;
+    box-shadow: 0 8px 32px rgba(0, 0, 0, 0.1);
+}
+
+.options-tabs {
+    display: flex;
+    gap: 10px;
+    margin-bottom: 30px;
+    flex-wrap: wrap;
+}
+
+.options-chain-controls {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-end;
+    margin-bottom: 30px;
+    gap: 20px;
+    flex-wrap: wrap;
+}
+
+.chain-form {
+    display: flex;
+    gap: 15px;
+    align-items: flex-end;
+}
+
+.chain-filters {
+    display: flex;
+    gap: 20px;
+    align-items: center;
+    flex-wrap: wrap;
+}
+
+.chain-filters label {
+    display: flex;
+    align-items: center;
+    gap: 5px;
+    font-size: 0.9rem;
+}
+
+.greek-selector {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+}
+
+.options-chain-container {
+    margin-top: 30px;
+}
+
+.chain-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 20px;
+    padding: 20px;
+    background: linear-gradient(135deg, #f8fafc, #e2e8f0);
+    border-radius: 15px;
+}
+
+.chain-stock-info {
+    display: flex;
+    gap: 20px;
+    align-items: center;
+}
+
+.stock-price {
+    font-size: 1.5rem;
+    font-weight: 600;
+    color: #1e293b;
+}
+
+.stock-change {
+    padding: 5px 12px;
+    border-radius: 8px;
+    font-weight: 500;
+    font-size: 0.9rem;
+}
+
+.options-table-container {
+    overflow-x: auto;
+    margin-bottom: 30px;
+    border-radius: 15px;
+    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1);
+}
+
+.options-table {
+    width: 100%;
+    border-collapse: collapse;
+    background: white;
+    font-size: 0.85rem;
+}
+
+.options-table th {
+    background: linear-gradient(135deg, #4f46e5, #7c3aed);
+    color: white;
+    padding: 12px 8px;
+    text-align: center;
+    font-weight: 600;
+    font-size: 0.8rem;
+}
+
+.section-header {
+    background: linear-gradient(135deg, #10b981, #059669) !important;
+}
+
+.calls-header {
+    background: linear-gradient(135deg, #10b981, #059669) !important;
+}
+
+.puts-header {
+    background: linear-gradient(135deg, #ef4444, #dc2626) !important;
+}
+
+.strike-header {
+    background: linear-gradient(135deg, #6b7280, #4b5563) !important;
+}
+
+.options-table td {
+    padding: 10px 8px;
+    text-align: center;
+    border-bottom: 1px solid #e5e7eb;
+    font-size: 0.8rem;
+}
+
+.options-table tbody tr:hover {
+    background: rgba(99, 102, 241, 0.05);
+}
+
+.strike-column {
+    background: rgba(107, 114, 128, 0.1) !important;
+    font-weight: 600;
+    font-size: 0.9rem;
+}
+
+.itm-call {
+    background: rgba(16, 185, 129, 0.1);
+}
+
+.itm-put {
+    background: rgba(239, 68, 68, 0.1);
+}
+
+.high-volume {
+    border-left: 3px solid #f59e0b;
+}
+
+.greek-highlight-delta { background: rgba(59, 130, 246, 0.2) !important; }
+.greek-highlight-gamma { background: rgba(16, 185, 129, 0.2) !important; }
+.greek-highlight-theta { background: rgba(239, 68, 68, 0.2) !important; }
+.greek-highlight-vega { background: rgba(139, 92, 246, 0.2) !important; }
+
+.volatility-analysis {
+    margin-top: 30px;
+    padding: 25px;
+    background: linear-gradient(135deg, #f8fafc, #e2e8f0);
+    border-radius: 15px;
+}
+
+.iv-metrics {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+    gap: 20px;
+    margin-bottom: 20px;
+}
+
+.iv-metric {
+    background: white;
+    padding: 15px;
+    border-radius: 10px;
+    text-align: center;
+    box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+}
+
+.iv-metric-label {
+    font-size: 0.9rem;
+    color: #64748b;
+    margin-bottom: 5px;
+}
+
+.iv-metric-value {
+    font-size: 1.5rem;
+    font-weight: 600;
+    color: #1e293b;
+}
+
+.iv-chart-container {
+    height: 300px;
+    background: white;
+    border-radius: 10px;
+    padding: 20px;
+}
+
+/* Strategy Builder Styles */
+.strategy-builder {
+    display: grid;
+    gap: 30px;
+}
+
+.template-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+    gap: 20px;
+}
+
+.strategy-template {
+    background: white;
+    border: 2px solid #e5e7eb;
+    border-radius: 15px;
+    padding: 20px;
+    cursor: pointer;
+    transition: all 0.3s ease;
+}
+
+.strategy-template:hover {
+    border-color: #4f46e5;
+    transform: translateY(-5px);
+    box-shadow: 0 8px 25px rgba(79, 70, 229, 0.15);
+}
+
+.strategy-template.selected {
+    border-color: #4f46e5;
+    background: rgba(79, 70, 229, 0.05);
+}
+
+.template-name {
+    font-size: 1.2rem;
+    font-weight: 600;
+    color: #1e293b;
+    margin-bottom: 10px;
+}
+
+.template-description {
+    color: #64748b;
+    font-size: 0.9rem;
+    margin-bottom: 15px;
+}
+
+.template-metrics {
+    display: grid;
+    gap: 8px;
+}
+
+.template-metric {
+    display: flex;
+    justify-content: space-between;
+    font-size: 0.85rem;
+}
+
+.metric-label {
+    color: #64748b;
+}
+
+.metric-value {
+    font-weight: 500;
+    color: #1e293b;
+}
+
+.custom-strategy {
+    background: white;
+    border-radius: 15px;
+    padding: 25px;
+}
+
+.strategy-form {
+    display: flex;
+    gap: 20px;
+    margin-bottom: 30px;
+    flex-wrap: wrap;
+}
+
+.strategy-legs {
+    margin-bottom: 30px;
+}
+
+.strategy-leg {
+    display: flex;
+    gap: 15px;
+    align-items: center;
+    padding: 15px;
+    background: #f8fafc;
+    border: 1px solid #e5e7eb;
+    border-radius: 10px;
+    margin-bottom: 15px;
+}
+
+.leg-controls {
+    display: flex;
+    gap: 10px;
+    align-items: center;
+    flex-wrap: wrap;
+}
+
+.leg-controls select,
+.leg-controls input {
+    padding: 8px 12px;
+    border: 1px solid #d1d5db;
+    border-radius: 6px;
+    font-size: 0.9rem;
+}
+
+.remove-leg {
+    background: #ef4444;
+    color: white;
+    border: none;
+    padding: 8px 12px;
+    border-radius: 6px;
+    cursor: pointer;
+    font-size: 0.8rem;
+}
+
+.remove-leg:hover {
+    background: #dc2626;
+}
+
+.strategy-analysis {
+    background: white;
+    border-radius: 15px;
+    padding: 25px;
+    margin-top: 30px;
+}
+
+.analysis-metrics {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+    gap: 20px;
+    margin-bottom: 30px;
+}
+
+.analysis-metric {
+    background: #f8fafc;
+    padding: 20px;
+    border-radius: 10px;
+    text-align: center;
+}
+
+.metric-title {
+    font-size: 0.9rem;
+    color: #64748b;
+    margin-bottom: 10px;
+}
+
+.metric-number {
+    font-size: 1.8rem;
+    font-weight: 600;
+    color: #1e293b;
+}
+
+.pnl-diagram {
+    margin-bottom: 30px;
+}
+
+.pnl-diagram canvas {
+    width: 100% !important;
+    height: 300px !important;
+}
+
+.greek-analysis {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+    gap: 15px;
+}
+
+.greek-item {
+    background: #f8fafc;
+    padding: 15px;
+    border-radius: 10px;
+    text-align: center;
+}
+
+.greek-name {
+    font-size: 0.8rem;
+    color: #64748b;
+    margin-bottom: 5px;
+}
+
+.greek-value {
+    font-size: 1.2rem;
+    font-weight: 600;
+    color: #1e293b;
+}
+
+/* Unusual Activity Styles */
+.unusual-activity {
+    display: grid;
+    gap: 30px;
+}
+
+.activity-controls {
+    background: white;
+    border-radius: 15px;
+    padding: 25px;
+}
+
+.activity-filters {
+    display: flex;
+    gap: 20px;
+    align-items: flex-end;
+    flex-wrap: wrap;
+}
+
+.filter-group {
+    display: flex;
+    flex-direction: column;
+    gap: 5px;
+}
+
+.filter-group label {
+    font-size: 0.9rem;
+    color: #64748b;
+    font-weight: 500;
+}
+
+.activity-results {
+    background: white;
+    border-radius: 15px;
+    padding: 25px;
+}
+
+.activity-list {
+    display: grid;
+    gap: 15px;
+}
+
+.activity-item {
+    background: #f8fafc;
+    border: 1px solid #e5e7eb;
+    border-radius: 10px;
+    padding: 20px;
+    transition: all 0.3s ease;
+}
+
+.activity-item:hover {
+    border-color: #4f46e5;
+    transform: translateY(-2px);
+    box-shadow: 0 4px 15px rgba(79, 70, 229, 0.1);
+}
+
+.activity-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 15px;
+}
+
+.activity-symbol {
+    font-size: 1.2rem;
+    font-weight: 600;
+    color: #1e293b;
+}
+
+.activity-type {
+    padding: 4px 8px;
+    border-radius: 6px;
+    font-size: 0.8rem;
+    font-weight: 500;
+}
+
+.activity-type.call {
+    background: rgba(16, 185, 129, 0.1);
+    color: #059669;
+}
+
+.activity-type.put {
+    background: rgba(239, 68, 68, 0.1);
+    color: #dc2626;
+}
+
+.activity-details {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(120px, 1fr));
+    gap: 15px;
+}
+
+.activity-detail {
+    text-align: center;
+}
+
+.detail-label {
+    font-size: 0.8rem;
+    color: #64748b;
+    margin-bottom: 2px;
+}
+
+.detail-value {
+    font-size: 0.95rem;
+    font-weight: 600;
+    color: #1e293b;
+}
+
+.volume-ratio {
+    color: #f59e0b;
+}
+
+.high-volume {
+    color: #ef4444;
+}
+
+/* Expiration Calendar Styles */
+.expiration-calendar {
+    display: grid;
+    gap: 30px;
+}
+
+.calendar-controls {
+    background: white;
+    border-radius: 15px;
+    padding: 25px;
+}
+
+.calendar-filters {
+    display: flex;
+    gap: 20px;
+    align-items: flex-end;
+    flex-wrap: wrap;
+}
+
+.calendar-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+    gap: 20px;
+}
+
+.expiration-card {
+    background: white;
+    border: 1px solid #e5e7eb;
+    border-radius: 15px;
+    padding: 20px;
+    transition: all 0.3s ease;
+}
+
+.expiration-card:hover {
+    border-color: #4f46e5;
+    transform: translateY(-3px);
+    box-shadow: 0 6px 20px rgba(79, 70, 229, 0.1);
+}
+
+.expiration-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 15px;
+}
+
+.expiration-date {
+    font-size: 1.1rem;
+    font-weight: 600;
+    color: #1e293b;
+}
+
+.days-to-expiry {
+    background: #f3f4f6;
+    color: #374151;
+    padding: 4px 8px;
+    border-radius: 6px;
+    font-size: 0.8rem;
+    font-weight: 500;
+}
+
+.expiration-type {
+    display: flex;
+    gap: 8px;
+    margin-bottom: 15px;
+}
+
+.type-badge {
+    padding: 3px 6px;
+    border-radius: 4px;
+    font-size: 0.7rem;
+    font-weight: 500;
+}
+
+.type-weekly {
+    background: rgba(59, 130, 246, 0.1);
+    color: #2563eb;
+}
+
+.type-monthly {
+    background: rgba(16, 185, 129, 0.1);
+    color: #059669;
+}
+
+.type-quarterly {
+    background: rgba(139, 92, 246, 0.1);
+    color: #8b5cf6;
+}
+
+.expiration-metrics {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 15px;
+}
+
+.metric {
+    text-align: center;
+}
+
+.metric-title {
+    font-size: 0.8rem;
+    color: #64748b;
+    margin-bottom: 5px;
+}
+
+.metric-value {
+    font-size: 1.1rem;
+    font-weight: 600;
+    color: #1e293b;
+}
+
+.expiration-events {
+    background: white;
+    border-radius: 15px;
+    padding: 25px;
+}
+
+.event-list {
+    display: grid;
+    gap: 15px;
+}
+
+.event-item {
+    background: #f8fafc;
+    border-left: 4px solid #4f46e5;
+    padding: 15px;
+    border-radius: 0 10px 10px 0;
+}
+
+.event-date {
+    font-weight: 600;
+    color: #1e293b;
+    margin-bottom: 5px;
+}
+
+.event-details {
+    color: #64748b;
+    font-size: 0.9rem;
+}
+
+.event-type {
+    display: inline-block;
+    background: rgba(79, 70, 229, 0.1);
+    color: #4f46e5;
+    padding: 2px 6px;
+    border-radius: 4px;
+    font-size: 0.8rem;
+    margin-right: 8px;
+}
+
+/* Responsive Design for Options */
+@media (max-width: 768px) {
+    .options-chain-controls {
+        flex-direction: column;
+        align-items: stretch;
+    }
+    
+    .chain-form {
+        flex-direction: column;
+    }
+    
+    .chain-filters {
+        justify-content: center;
+    }
+    
+    .options-table {
+        font-size: 0.7rem;
+    }
+    
+    .options-table th,
+    .options-table td {
+        padding: 6px 4px;
+    }
+    
+    .strategy-form {
+        flex-direction: column;
+    }
+    
+    .strategy-leg {
+        flex-direction: column;
+        align-items: stretch;
+    }
+    
+    .leg-controls {
+        justify-content: center;
+    }
+    
+    .activity-filters {
+        flex-direction: column;
+    }
+    
+    .calendar-filters {
+        flex-direction: column;
+    }
+    
+    .template-grid {
+        grid-template-columns: 1fr;
+    }
+    
+    .calendar-grid {
+        grid-template-columns: 1fr;
+    }
+}
+
+@media (max-width: 480px) {
+    .options-tabs {
+        flex-direction: column;
+    }
+    
+    .activity-details {
+        grid-template-columns: repeat(2, 1fr);
+    }
+    
+    .iv-metrics {
+        grid-template-columns: 1fr;
+    }
+    
+    .analysis-metrics {
+        grid-template-columns: 1fr;
+    }
+}

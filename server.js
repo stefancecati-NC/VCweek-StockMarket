@@ -9,6 +9,9 @@ const aiService = require('./services/aiService');
 const fundamentalsService = require('./services/fundamentalsService');
 const newsService = require('./services/newsService');
 const investmentSimulator = require('./services/investmentSimulator');
+const OptionsService = require('./services/optionsService');
+
+const optionsService = new OptionsService();
 
 const app = express();
 const PORT = process.env.PORT || 3000;
@@ -207,6 +210,116 @@ app.get('/api/sentiment-analysis/:symbol', async (req, res) => {
     } catch (error) {
         console.error('Error fetching sentiment analysis:', error);
         res.status(500).json({ error: 'Failed to fetch sentiment analysis' });
+    }
+});
+
+// Options Trading API Endpoints
+app.get('/api/options-chain/:symbol', async (req, res) => {
+    try {
+        const { symbol } = req.params;
+        const { expiration } = req.query;
+        const data = await optionsService.getOptionsChain(symbol.toUpperCase(), expiration);
+        res.json(data);
+    } catch (error) {
+        console.error('Error fetching options chain:', error);
+        res.status(500).json({ error: 'Failed to fetch options chain' });
+    }
+});
+
+app.get('/api/unusual-options-activity', async (req, res) => {
+    try {
+        const filters = {
+            symbol: req.query.symbol,
+            optionType: req.query.type,
+            volumeThreshold: req.query.volumeThreshold
+        };
+        const data = await optionsService.getUnusualActivity(filters);
+        res.json(data);
+    } catch (error) {
+        console.error('Error fetching unusual options activity:', error);
+        res.status(500).json({ error: 'Failed to fetch unusual options activity' });
+    }
+});
+
+app.get('/api/options-expiration-calendar', async (req, res) => {
+    try {
+        const { symbol } = req.query;
+        const data = await optionsService.getExpirationCalendar(symbol);
+        res.json(data);
+    } catch (error) {
+        console.error('Error fetching expiration calendar:', error);
+        res.status(500).json({ error: 'Failed to fetch expiration calendar' });
+    }
+});
+
+app.post('/api/analyze-options-strategy', async (req, res) => {
+    try {
+        const { legs, stockPrice, expirationDate } = req.body;
+        
+        if (!legs || !stockPrice || !expirationDate) {
+            return res.status(400).json({ error: 'Missing required parameters: legs, stockPrice, expirationDate' });
+        }
+        
+        const data = optionsService.analyzeStrategy(legs, parseFloat(stockPrice), expirationDate);
+        res.json(data);
+    } catch (error) {
+        console.error('Error analyzing options strategy:', error);
+        res.status(500).json({ error: 'Failed to analyze options strategy' });
+    }
+});
+
+app.get('/api/options-strategies', (req, res) => {
+    try {
+        const strategies = optionsService.getStrategies();
+        res.json(strategies);
+    } catch (error) {
+        console.error('Error fetching options strategies:', error);
+        res.status(500).json({ error: 'Failed to fetch options strategies' });
+    }
+});
+
+app.post('/api/calculate-option-greeks', async (req, res) => {
+    try {
+        const { stockPrice, strike, timeToExpiry, interestRate, volatility, optionType } = req.body;
+        
+        if (!stockPrice || !strike || !timeToExpiry || !volatility || !optionType) {
+            return res.status(400).json({ error: 'Missing required parameters' });
+        }
+        
+        const greeks = optionsService.calculateGreeks(
+            parseFloat(stockPrice),
+            parseFloat(strike),
+            parseFloat(timeToExpiry),
+            parseFloat(interestRate) || 0.05,
+            parseFloat(volatility),
+            optionType
+        );
+        
+        res.json(greeks);
+    } catch (error) {
+        console.error('Error calculating option Greeks:', error);
+        res.status(500).json({ error: 'Failed to calculate option Greeks' });
+    }
+});
+
+app.post('/api/calculate-strategy-pnl', async (req, res) => {
+    try {
+        const { strategy, stockPrices, currentStockPrice } = req.body;
+        
+        if (!strategy || !stockPrices || !currentStockPrice) {
+            return res.status(400).json({ error: 'Missing required parameters' });
+        }
+        
+        const pnlData = optionsService.calculateStrategyPnL(
+            strategy,
+            stockPrices,
+            parseFloat(currentStockPrice)
+        );
+        
+        res.json(pnlData);
+    } catch (error) {
+        console.error('Error calculating strategy P&L:', error);
+        res.status(500).json({ error: 'Failed to calculate strategy P&L' });
     }
 });
 
