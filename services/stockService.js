@@ -15,12 +15,12 @@ class StockService {
 
     async getMarketOverview() {
         try {
-            const marketData = {
-                indices: await this.getMarketIndices(),
-                topMovers: await this.getTopMovers(),
-                majorStocks: await this.getMajorStocksData(),
-                timestamp: new Date().toISOString()
-            };
+                    const marketData = {
+            indices: await this.getMarketIndices(),
+            topMovers: await this.getTopMovers(),
+            majorStocks: await this.getMajorStocksData(),
+            timestamp: new Date().toISOString()
+        };
             
             return marketData;
         } catch (error) {
@@ -94,6 +94,8 @@ class StockService {
             return {};
         }
     }
+
+
 
     async getEarningsCalendar(days = 7) {
         try {

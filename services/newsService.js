@@ -90,10 +90,10 @@ class NewsService {
                 },
                 breakdown: {
                     news: {
-                        score: newsData.sentimentAnalysis?.score || 0.6,
-                        articles: newsData.articles?.length || 0,
-                        positiveCount: newsData.sentimentAnalysis?.positive || 0,
-                        negativeCount: newsData.sentimentAnalysis?.negative || 0
+                        score: (newsData.sentimentAnalysis && newsData.sentimentAnalysis.score) || 0.6,
+                        articles: (newsData.articles && newsData.articles.length) || 0,
+                        positiveCount: (newsData.sentimentAnalysis && newsData.sentimentAnalysis.positive) || 0,
+                        negativeCount: (newsData.sentimentAnalysis && newsData.sentimentAnalysis.negative) || 0
                     },
                     social: {
                         score: socialData.overallSentiment || 0.55,
@@ -268,8 +268,8 @@ class NewsService {
 
     generateNewsSummary(articles) {
         const totalArticles = articles.length;
-        const positiveArticles = articles.filter(a => a.sentiment?.label === 'positive').length;
-        const negativeArticles = articles.filter(a => a.sentiment?.label === 'negative').length;
+        const positiveArticles = articles.filter(a => a.sentiment && a.sentiment.label === 'positive').length;
+        const negativeArticles = articles.filter(a => a.sentiment && a.sentiment.label === 'negative').length;
         
         return {
             totalArticles,
@@ -288,7 +288,7 @@ class NewsService {
             return { score: 0, label: 'neutral', confidence: 0 };
         }
 
-        const sentiments = articles.map(a => a.sentiment?.score || 0);
+        const sentiments = articles.map(a => (a.sentiment && a.sentiment.score) || 0);
         const averageScore = sentiments.reduce((sum, score) => sum + score, 0) / sentiments.length;
         
         let label = 'neutral';
@@ -388,7 +388,7 @@ class NewsService {
         const socialWeight = 0.3;
         const analystWeight = 0.3;
         
-        const newsScore = newsData.sentimentAnalysis?.score || 0;
+        const newsScore = (newsData.sentimentAnalysis && newsData.sentimentAnalysis.score) || 0;
         const socialScore = socialData.overallSentiment || 0;
         const analystScore = analystData.consensusScore || 0;
         
@@ -425,12 +425,12 @@ class NewsService {
     identifyKeyEvents(articles) {
         // Identify high-impact news events
         return articles
-            .filter(article => article.relevanceScore > 0.8 || article.sentiment?.score > 0.5)
+            .filter(article => article.relevanceScore > 0.8 || (article.sentiment && article.sentiment.score > 0.5))
             .slice(0, 5)
             .map(article => ({
                 title: article.title,
                 impact: article.relevanceScore > 0.9 ? 'high' : 'medium',
-                sentiment: article.sentiment?.label || 'neutral',
+                sentiment: (article.sentiment && article.sentiment.label) || 'neutral',
                 date: article.publishedAt
             }));
     }
@@ -442,7 +442,7 @@ class NewsService {
             let impact = 0.5; // base impact
             
             // Adjust based on sentiment strength
-            if (article.sentiment?.score) {
+            if (article.sentiment && article.sentiment.score) {
                 impact += Math.abs(article.sentiment.score) * 0.3;
             }
             

@@ -163,6 +163,114 @@ section h2 i {
     background: rgba(220, 38, 38, 0.1);
 }
 
+
+
+/* Charts Section */
+.charts-section {
+    margin-top: 30px;
+    padding-top: 30px;
+    border-top: 1px solid rgba(102, 126, 234, 0.1);
+}
+
+.charts-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 25px;
+    flex-wrap: wrap;
+    gap: 20px;
+}
+
+.charts-header h3 {
+    font-size: 1.5rem;
+    font-weight: 600;
+    color: #333;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+}
+
+.charts-header h3 i {
+    color: #667eea;
+}
+
+.timeframe-controls {
+    display: flex;
+    background: rgba(102, 126, 234, 0.1);
+    border-radius: 12px;
+    padding: 4px;
+    gap: 2px;
+}
+
+.timeframe-btn {
+    padding: 8px 16px;
+    border: none;
+    background: transparent;
+    border-radius: 8px;
+    font-weight: 600;
+    font-size: 0.9rem;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    color: #667eea;
+    min-width: 50px;
+}
+
+.timeframe-btn:hover {
+    background: rgba(102, 126, 234, 0.2);
+}
+
+.timeframe-btn.active {
+    background: linear-gradient(135deg, #667eea, #764ba2);
+    color: white;
+    box-shadow: 0 2px 8px rgba(102, 126, 234, 0.3);
+}
+
+.charts-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(350px, 1fr));
+    gap: 25px;
+}
+
+.chart-container {
+    background: linear-gradient(135deg, #f8f9ff, #e8eaff);
+    border-radius: 16px;
+    padding: 20px;
+    border: 1px solid rgba(102, 126, 234, 0.1);
+    transition: transform 0.3s ease;
+}
+
+.chart-container:hover {
+    transform: translateY(-3px);
+    box-shadow: 0 8px 30px rgba(102, 126, 234, 0.15);
+}
+
+.chart-title {
+    font-size: 1.1rem;
+    font-weight: 600;
+    color: #333;
+    margin-bottom: 15px;
+    text-align: center;
+}
+
+.chart-container canvas {
+    width: 100% !important;
+    height: 200px !important;
+}
+
+/* Chart Loading State */
+.chart-loading {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    height: 200px;
+    color: #667eea;
+    font-size: 1rem;
+}
+
+.chart-loading i {
+    margin-right: 10px;
+}
+
 /* AI Summary */
 .summary-card {
     background: linear-gradient(135deg, #f0f9ff, #e0f2fe);
@@ -512,6 +620,30 @@ section h2 i {
     .earnings-details {
         justify-content: space-around;
         width: 100%;
+    }
+    
+
+    /* Chart responsive styles */
+    .charts-grid {
+        grid-template-columns: 1fr;
+        gap: 20px;
+    }
+    
+    .charts-header {
+        flex-direction: column;
+        align-items: flex-start;
+        gap: 15px;
+    }
+    
+    .timeframe-controls {
+        width: 100%;
+        justify-content: center;
+    }
+    
+    .timeframe-btn {
+        flex: 1;
+        padding: 10px 8px;
+        font-size: 0.8rem;
     }
     
     section {

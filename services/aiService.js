@@ -1,10 +1,11 @@
-const OpenAI = require('openai');
+const { Configuration, OpenAIApi } = require('openai');
 
 class AIService {
     constructor() {
-        this.openai = new OpenAI({
+        const configuration = new Configuration({
             apiKey: process.env.OPENAI_API_KEY,
         });
+        this.openai = new OpenAIApi(configuration);
     }
 
     async generateDailySummary(marketData, earningsData) {
@@ -16,7 +17,7 @@ class AIService {
 
             const prompt = this.buildPrompt(marketData, earningsData);
             
-            const completion = await this.openai.chat.completions.create({
+            const completion = await this.openai.createChatCompletion({
                 model: "gpt-3.5-turbo",
                 messages: [
                     {
@@ -33,8 +34,8 @@ class AIService {
             });
 
             return {
-                summary: completion.choices[0].message.content,
-                keyPoints: this.extractKeyPoints(completion.choices[0].message.content),
+                summary: completion.data.choices[0].message.content,
+                keyPoints: this.extractKeyPoints(completion.data.choices[0].message.content),
                 sentiment: this.analyzeSentiment(marketData),
                 generatedAt: new Date().toISOString()
             };
@@ -57,14 +58,14 @@ class AIService {
         
         // Top movers
         prompt += "\nTop Gainers:\n";
-        if (marketData.topMovers?.gainers) {
+        if (marketData.topMovers && marketData.topMovers.gainers) {
             marketData.topMovers.gainers.forEach(stock => {
                 prompt += `${stock.symbol}: $${stock.price} (+${stock.change}, +${stock.changePercent}%)\n`;
             });
         }
         
         prompt += "\nTop Losers:\n";
-        if (marketData.topMovers?.losers) {
+        if (marketData.topMovers && marketData.topMovers.losers) {
             marketData.topMovers.losers.forEach(stock => {
                 prompt += `${stock.symbol}: $${stock.price} (${stock.change}, ${stock.changePercent}%)\n`;
             });
@@ -129,12 +130,12 @@ class AIService {
         
         let mockSummary = `Today's market session showed ${sentiment} sentiment with mixed performance across major indices. `;
         
-        if (marketData.topMovers?.gainers?.length > 0) {
+        if (marketData.topMovers && marketData.topMovers.gainers && marketData.topMovers.gainers.length > 0) {
             const topGainer = marketData.topMovers.gainers[0];
             mockSummary += `${topGainer.symbol} led gains with a ${topGainer.changePercent}% increase to $${topGainer.price}. `;
         }
         
-        if (marketData.topMovers?.losers?.length > 0) {
+        if (marketData.topMovers && marketData.topMovers.losers && marketData.topMovers.losers.length > 0) {
             const topLoser = marketData.topMovers.losers[0];
             mockSummary += `On the downside, ${topLoser.symbol} declined ${Math.abs(topLoser.changePercent)}% to $${topLoser.price}. `;
         }

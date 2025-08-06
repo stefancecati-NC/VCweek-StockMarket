@@ -9,6 +9,10 @@ class StockMarketApp {
         this.bindEventListeners();
         this.loadInitialData();
         this.bindNewEventListeners();
+        // Initialize charts after all other data is loaded and DOM is ready
+        setTimeout(() => {
+            this.initializeCharts();
+        }, 2000);
     }
 
     bindEventListeners() {
@@ -204,6 +208,8 @@ class StockMarketApp {
             </div>
         `;
     }
+
+
 
     renderTopMovers(topMovers) {
         if (!topMovers) return;
@@ -1569,6 +1575,309 @@ class StockMarketApp {
 
     formatRatioName(camelCase) {
         return camelCase.replace(/([A-Z])/g, ' $1').replace(/^./, str => str.toUpperCase());
+    }
+
+    // Chart functionality
+    initializeCharts() {
+        console.log('Initializing charts...');
+        
+        // Check if Chart.js is loaded
+        if (typeof Chart === 'undefined') {
+            console.error('Chart.js is not loaded');
+            return;
+        }
+        
+        // Check if chart elements exist
+        const requiredElements = ['spyChart', 'qqqChart', 'diaChart'];
+        const missingElements = requiredElements.filter(id => !document.getElementById(id));
+        
+        if (missingElements.length > 0) {
+            console.error('Missing chart elements:', missingElements);
+            console.log('Retrying chart initialization in 1 second...');
+            setTimeout(() => this.initializeCharts(), 1000);
+            return;
+        }
+        
+        // Check if charts section exists
+        const chartsSection = document.querySelector('.charts-section');
+        if (!chartsSection) {
+            console.error('Charts section not found');
+            return;
+        }
+        
+        console.log('All chart elements found, proceeding with initialization');
+        this.charts = {};
+        this.currentTimeframe = '1D';
+        this.bindChartEventListeners();
+        this.loadChartsData();
+    }
+
+    bindChartEventListeners() {
+        // Timeframe button listeners
+        document.querySelectorAll('.timeframe-btn').forEach(btn => {
+            btn.addEventListener('click', (e) => {
+                // Update active button
+                document.querySelectorAll('.timeframe-btn').forEach(b => b.classList.remove('active'));
+                e.target.classList.add('active');
+                
+                // Update timeframe and reload charts
+                this.currentTimeframe = e.target.dataset.timeframe;
+                this.loadChartsData();
+            });
+        });
+    }
+
+    async loadChartsData() {
+        const symbols = ['SPY', 'QQQ', 'DIA'];
+        
+        console.log('Loading charts data for symbols:', symbols);
+        
+        // Generate mock data for each symbol and create charts
+        for (const symbol of symbols) {
+            console.log(`Processing chart for ${symbol}`);
+            
+            const chartElementId = `${symbol.toLowerCase()}Chart`;
+            const chartElement = document.getElementById(chartElementId);
+            
+            if (!chartElement) {
+                console.error(`Chart element ${chartElementId} not found`);
+                continue;
+            }
+
+            const chartContainer = chartElement.parentNode;
+            if (!chartContainer) {
+                console.error(`Chart container for ${chartElementId} not found`);
+                continue;
+            }
+
+            // Show loading state
+            chartContainer.innerHTML = `
+                <div class="chart-title">${this.getChartTitle(symbol)}</div>
+                <div class="chart-loading">
+                    <i class="fas fa-spinner fa-spin"></i>
+                    Loading chart data...
+                </div>
+            `;
+
+            // Wait a moment for DOM update
+            await new Promise(resolve => setTimeout(resolve, 100));
+            
+            // Recreate the canvas element
+            chartContainer.innerHTML = `
+                <div class="chart-title">${this.getChartTitle(symbol)}</div>
+                <canvas id="${chartElementId}" width="400" height="200"></canvas>
+            `;
+
+            // Wait for canvas to be ready
+            await new Promise(resolve => setTimeout(resolve, 50));
+            
+            const chartData = this.generateMockChartData(symbol, this.currentTimeframe);
+            this.createChart(symbol, chartData);
+        }
+    }
+
+    generateMockChartData(symbol, timeframe) {
+        const points = this.getDataPointsForTimeframe(timeframe);
+        const basePrice = this.getBasePriceForSymbol(symbol);
+        const data = [];
+        const labels = [];
+        
+        let currentPrice = basePrice;
+        const startDate = new Date();
+        
+        // Generate historical data points
+        for (let i = points - 1; i >= 0; i--) {
+            const date = new Date(startDate);
+            
+            switch (timeframe) {
+                case '1D':
+                    date.setHours(date.getHours() - i);
+                    labels.push(date.toLocaleTimeString('en-US', { hour: '2-digit', minute: '2-digit' }));
+                    break;
+                case '1W':
+                    date.setDate(date.getDate() - i);
+                    labels.push(date.toLocaleDateString('en-US', { weekday: 'short' }));
+                    break;
+                case '1M':
+                    date.setDate(date.getDate() - i);
+                    labels.push(date.toLocaleDateString('en-US', { month: 'short', day: 'numeric' }));
+                    break;
+                case '1Y':
+                    date.setMonth(date.getMonth() - i);
+                    labels.push(date.toLocaleDateString('en-US', { month: 'short', year: '2-digit' }));
+                    break;
+            }
+            
+            // Generate realistic price movement with trend
+            const volatility = this.getVolatilityForSymbol(symbol);
+            const trendFactor = this.getTrendForSymbol(symbol, timeframe);
+            const randomChange = (Math.random() - 0.5) * volatility;
+            const trendChange = trendFactor * 0.001; // Small trend component
+            const totalChange = randomChange + trendChange;
+            currentPrice *= (1 + totalChange);
+            data.push(parseFloat(currentPrice.toFixed(2)));
+        }
+        
+        return { labels, data };
+    }
+
+    getDataPointsForTimeframe(timeframe) {
+        switch (timeframe) {
+            case '1D': return 24; // 24 hours
+            case '1W': return 7;  // 7 days
+            case '1M': return 30; // 30 days
+            case '1Y': return 12; // 12 months
+            default: return 24;
+        }
+    }
+
+    getBasePriceForSymbol(symbol) {
+        const basePrices = {
+            'SPY': 450.25, // Updated S&P 500 ETF price
+            'QQQ': 385.30, // Updated NASDAQ ETF price  
+            'DIA': 355.80  // Updated Dow Jones ETF price
+        };
+        return basePrices[symbol] || 400;
+    }
+
+    getVolatilityForSymbol(symbol) {
+        const volatilities = {
+            'SPY': 0.015, // 1.5% daily volatility
+            'QQQ': 0.025, // 2.5% daily volatility
+            'DIA': 0.012  // 1.2% daily volatility
+        };
+        return volatilities[symbol] || 0.02;
+    }
+
+    getTrendForSymbol(symbol, timeframe) {
+        // Simulate realistic market trends based on symbol and timeframe
+        const trends = {
+            'SPY': { '1D': 0.2, '1W': 0.8, '1M': 1.2, '1Y': 2.5 }, // Generally upward trending
+            'QQQ': { '1D': 0.1, '1W': 1.0, '1M': 1.5, '1Y': 3.2 }, // Tech growth trend
+            'DIA': { '1D': 0.3, '1W': 0.6, '1M': 0.9, '1Y': 1.8 }  // Conservative growth
+        };
+        return trends[symbol] && trends[symbol][timeframe] || 1.0;
+    }
+
+    getChartTitle(symbol) {
+        const titles = {
+            'SPY': 'S&P 500 (SPY)',
+            'QQQ': 'NASDAQ (QQQ)',
+            'DIA': 'Dow Jones (DIA)'
+        };
+        return titles[symbol] || symbol;
+    }
+
+    createChart(symbol, chartData) {
+        const chartId = `${symbol.toLowerCase()}Chart`;
+        const chartElement = document.getElementById(chartId);
+        
+        if (!chartElement) {
+            console.warn(`Chart element ${chartId} not found`);
+            return;
+        }
+        
+        console.log(`Creating chart for ${symbol}`);
+        
+        const chartContext = chartElement.getContext('2d');
+        
+        // Destroy existing chart if it exists
+        if (this.charts[symbol]) {
+            this.charts[symbol].destroy();
+        }
+        
+        // Determine if price trend is up or down
+        const isPositive = chartData.data[chartData.data.length - 1] > chartData.data[0];
+        const color = isPositive ? '#059669' : '#dc2626';
+        
+        try {
+            this.charts[symbol] = new Chart(chartContext, {
+            type: 'line',
+            data: {
+                labels: chartData.labels,
+                datasets: [{
+                    label: symbol,
+                    data: chartData.data,
+                    borderColor: color,
+                    backgroundColor: `${color}20`,
+                    borderWidth: 2,
+                    fill: true,
+                    tension: 0.1,
+                    pointBackgroundColor: color,
+                    pointBorderColor: color,
+                    pointRadius: 0,
+                    pointHoverRadius: 4
+                }]
+            },
+            options: {
+                responsive: true,
+                maintainAspectRatio: false,
+                interaction: {
+                    intersect: false,
+                    mode: 'index'
+                },
+                plugins: {
+                    legend: {
+                        display: false
+                    },
+                    tooltip: {
+                        backgroundColor: 'rgba(255, 255, 255, 0.95)',
+                        titleColor: '#333',
+                        bodyColor: '#333',
+                        borderColor: '#e5e7eb',
+                        borderWidth: 1,
+                        cornerRadius: 8,
+                        displayColors: false,
+                        callbacks: {
+                            label: function(context) {
+                                return `$${context.parsed.y.toFixed(2)}`;
+                            }
+                        }
+                    }
+                },
+                scales: {
+                    x: {
+                        display: true,
+                        grid: {
+                            color: 'rgba(102, 126, 234, 0.1)'
+                        },
+                        ticks: {
+                            color: '#6b7280',
+                            font: {
+                                size: 11
+                            },
+                            maxTicksLimit: 8
+                        }
+                    },
+                    y: {
+                        display: true,
+                        grid: {
+                            color: 'rgba(102, 126, 234, 0.1)'
+                        },
+                        ticks: {
+                            color: '#6b7280',
+                            font: {
+                                size: 11
+                            },
+                            callback: function(value) {
+                                return '$' + value.toFixed(0);
+                            }
+                        }
+                    }
+                }
+            }
+        });
+        } catch (error) {
+            console.error(`Error creating chart for ${symbol}:`, error);
+            // Show error message in chart container
+            chartElement.parentNode.innerHTML = `
+                <div class="chart-title">${this.getChartTitle(symbol)}</div>
+                <div class="chart-loading">
+                    <i class="fas fa-exclamation-triangle"></i>
+                    Error loading chart
+                </div>
+            `;
+        }
     }
 }
 

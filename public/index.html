@@ -7,6 +7,7 @@
     <link rel="stylesheet" href="styles.css">
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 </head>
 <body>
     <div class="container">
@@ -25,14 +26,6 @@
             </div>
         </header>
 
-        <!-- Market Overview -->
-        <section class="market-overview">
-            <h2><i class="fas fa-globe"></i> Market Overview</h2>
-            <div class="indices-grid" id="indicesGrid">
-                <!-- Market indices will be populated here -->
-            </div>
-        </section>
-
         <!-- AI Summary -->
         <section class="ai-summary">
             <h2><i class="fas fa-robot"></i> AI-Generated Daily Summary</h2>
@@ -45,6 +38,42 @@
                 </div>
                 <div class="key-points" id="keyPoints">
                     <!-- Key points will be populated here -->
+                </div>
+            </div>
+        </section>
+
+        <!-- Market Overview -->
+        <section class="market-overview">
+            <h2><i class="fas fa-globe"></i> Market Overview</h2>
+            <div class="indices-grid" id="indicesGrid">
+                <!-- Market indices will be populated here -->
+            </div>
+            
+
+            <!-- Interactive Charts Section -->
+            <div class="charts-section">
+                <div class="charts-header">
+                    <h3><i class="fas fa-chart-line"></i> Market Charts</h3>
+                    <div class="timeframe-controls">
+                        <button class="timeframe-btn active" data-timeframe="1D">1D</button>
+                        <button class="timeframe-btn" data-timeframe="1W">1W</button>
+                        <button class="timeframe-btn" data-timeframe="1M">1M</button>
+                        <button class="timeframe-btn" data-timeframe="1Y">1Y</button>
+                    </div>
+                </div>
+                <div class="charts-grid">
+                    <div class="chart-container">
+                        <div class="chart-title">S&P 500 (SPY)</div>
+                        <canvas id="spyChart" width="400" height="200"></canvas>
+                    </div>
+                    <div class="chart-container">
+                        <div class="chart-title">NASDAQ (QQQ)</div>
+                        <canvas id="qqqChart" width="400" height="200"></canvas>
+                    </div>
+                    <div class="chart-container">
+                        <div class="chart-title">Dow Jones (DIA)</div>
+                        <canvas id="diaChart" width="400" height="200"></canvas>
+                    </div>
                 </div>
             </div>
         </section>
