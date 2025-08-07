@@ -265,7 +265,7 @@
 }
 
 [data-theme="dark"] .search-container input::placeholder {
-    color: #94a3b8;
+    color: #a1a1aa;
 }
 
 [data-theme="dark"] .search-container input:focus {
@@ -295,6 +295,44 @@
 
 [data-theme="dark"] .portfolio-management h3 {
     color: #f1f5f9;
+}
+
+/* Error modal and modals - dark mode */
+[data-theme="dark"] .modal-content {
+    background-color: rgba(30, 41, 59, 0.95);
+    color: #f1f5f9;
+    border: 1px solid rgba(148, 163, 184, 0.2);
+}
+
+[data-theme="dark"] .modal-content h3 {
+    color: #f1f5f9;
+}
+
+[data-theme="dark"] .modal-content p {
+    color: #e2e8f0;
+    font-weight: 500;
+}
+
+[data-theme="dark"] .close {
+    color: #94a3b8;
+}
+
+[data-theme="dark"] .close:hover {
+    color: #f1f5f9;
+}
+
+/* Error message text - darker and more prominent */
+[data-theme="dark"] #errorMessage {
+    color: #f8fafc;
+    font-weight: 600;
+    font-size: 1.1rem;
+}
+
+/* Light mode error message - ensure it's dark enough */
+#errorMessage {
+    color: #1f2937;
+    font-weight: 600;
+    font-size: 1.1rem;
 }
 
 /* Stat cards - darker in dark mode */
