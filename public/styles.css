@@ -98,6 +98,10 @@
     color: #f1f5f9;
 }
 
+[data-theme="dark"] .charts-header h3 {
+    color: #f1f5f9;
+}
+
 body {
     font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
     background: linear-gradient(135deg, var(--bg-gradient-start) 0%, var(--bg-gradient-end) 100%);
