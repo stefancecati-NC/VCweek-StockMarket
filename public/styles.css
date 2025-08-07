@@ -200,6 +200,249 @@
     border: 1px solid rgba(148, 163, 184, 0.2);
 }
 
+/* Search input placeholder - darker in dark mode */
+[data-theme="dark"] .search-container input {
+    background: rgba(51, 65, 85, 0.8);
+    border: 2px solid rgba(148, 163, 184, 0.3);
+    color: #f1f5f9;
+}
+
+[data-theme="dark"] .search-container input::placeholder {
+    color: #94a3b8;
+}
+
+[data-theme="dark"] .search-container input:focus {
+    border-color: #60a5fa;
+    box-shadow: 0 0 0 3px rgba(96, 165, 250, 0.1);
+}
+
+/* News articles in sentiment section - darker in dark mode */
+[data-theme="dark"] .news-article {
+    background: rgba(51, 65, 85, 0.8);
+    border-left: 4px solid #f59e0b;
+}
+
+[data-theme="dark"] .news-article:hover {
+    box-shadow: 0 8px 25px rgba(0, 0, 0, 0.4);
+}
+
+/* Portfolio management - a little more darker in dark mode */
+[data-theme="dark"] .portfolio-management {
+    background: rgba(30, 41, 59, 0.85);
+    border: 1px solid rgba(148, 163, 184, 0.2);
+}
+
+[data-theme="dark"] .portfolio-management h2 {
+    color: #f1f5f9;
+}
+
+/* Stat cards - darker in dark mode */
+[data-theme="dark"] .stat-card {
+    background: rgba(51, 65, 85, 0.8);
+    border: 1px solid rgba(148, 163, 184, 0.2);
+}
+
+[data-theme="dark"] .stat-card:hover {
+    box-shadow: 0 8px 25px rgba(0, 0, 0, 0.4);
+}
+
+[data-theme="dark"] .stat-card h3 {
+    color: #cbd5e1;
+}
+
+[data-theme="dark"] .stat-value {
+    color: #f1f5f9;
+}
+
+/* News summary - darker in dark mode */
+[data-theme="dark"] .news-summary {
+    background: rgba(51, 65, 85, 0.8);
+    border: 1px solid rgba(148, 163, 184, 0.2);
+}
+
+/* News filters select (All Categories dropdown) - darker in dark mode */
+[data-theme="dark"] .news-filters select {
+    background: rgba(51, 65, 85, 0.8);
+    border: 2px solid rgba(148, 163, 184, 0.3);
+    color: #f1f5f9;
+}
+
+[data-theme="dark"] .news-filters select option {
+    background: #334155;
+    color: #f1f5f9;
+}
+
+/* Article titles in news & sentiment analysis - lighter in dark mode */
+[data-theme="dark"] .article-title {
+    color: #f1f5f9;
+}
+
+/* Future Investment Projection buttons - darker in dark mode */
+[data-theme="dark"] .simulator-tabs .tab-btn {
+    background: rgba(51, 65, 85, 0.8);
+    color: #cbd5e1;
+    border: 1px solid rgba(148, 163, 184, 0.2);
+}
+
+[data-theme="dark"] .simulator-tabs .tab-btn:hover {
+    background: rgba(71, 85, 105, 0.9);
+    color: #f1f5f9;
+}
+
+[data-theme="dark"] .simulator-tabs .tab-btn.active {
+    background: linear-gradient(135deg, #475569, #334155);
+    color: #f1f5f9;
+    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.3);
+}
+
+[data-theme="dark"] .btn-primary {
+    background: linear-gradient(135deg, #475569, #334155);
+    border: 1px solid rgba(148, 163, 184, 0.2);
+}
+
+[data-theme="dark"] .btn-primary:hover {
+    box-shadow: 0 8px 25px rgba(0, 0, 0, 0.4);
+}
+
+/* Article descriptions (like oil futures text) - lighter in dark mode */
+[data-theme="dark"] .article-description {
+    color: #cbd5e1;
+}
+
+/* Options trading form labels (Symbol and Expiration) - lighter in dark mode */
+[data-theme="dark"] .options-trading .form-group label {
+    color: #f1f5f9;
+}
+
+/* Future Investment Projection input placeholders - darker in dark mode */
+[data-theme="dark"] .investment-simulator .form-group input {
+    background: rgba(51, 65, 85, 0.8);
+    border: 2px solid rgba(148, 163, 184, 0.3);
+    color: #f1f5f9;
+}
+
+[data-theme="dark"] .investment-simulator .form-group input::placeholder {
+    color: #64748b;
+}
+
+[data-theme="dark"] .investment-simulator .form-group input:focus {
+    border-color: #60a5fa;
+    box-shadow: 0 0 0 3px rgba(96, 165, 250, 0.1);
+}
+
+/* All form inputs and placeholders - dark mode */
+[data-theme="dark"] .form-group input,
+[data-theme="dark"] .form-group select {
+    background: rgba(51, 65, 85, 0.8);
+    border: 2px solid rgba(148, 163, 184, 0.3);
+    color: #f1f5f9;
+}
+
+[data-theme="dark"] .form-group input::placeholder {
+    color: #64748b;
+}
+
+[data-theme="dark"] .form-group input:focus,
+[data-theme="dark"] .form-group select:focus {
+    border-color: #60a5fa;
+    box-shadow: 0 0 0 3px rgba(96, 165, 250, 0.1);
+}
+
+[data-theme="dark"] .form-group select option {
+    background: #334155;
+    color: #f1f5f9;
+}
+
+/* Secondary buttons - dark mode */
+[data-theme="dark"] .btn-secondary {
+    background: rgba(51, 65, 85, 0.8);
+    color: #f1f5f9;
+    border: 2px solid rgba(148, 163, 184, 0.3);
+}
+
+[data-theme="dark"] .btn-secondary:hover {
+    background: rgba(71, 85, 105, 0.9);
+    border-color: #60a5fa;
+}
+
+/* Timeframe buttons - dark mode */
+[data-theme="dark"] .timeframe-btn {
+    background: rgba(51, 65, 85, 0.8);
+    color: #cbd5e1;
+    border: 1px solid rgba(148, 163, 184, 0.2);
+}
+
+[data-theme="dark"] .timeframe-btn:hover {
+    background: rgba(71, 85, 105, 0.9);
+    color: #f1f5f9;
+}
+
+[data-theme="dark"] .timeframe-btn.active {
+    background: linear-gradient(135deg, #475569, #334155);
+    color: #f1f5f9;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.3);
+}
+
+/* General tab buttons - dark mode */
+[data-theme="dark"] .tab-btn {
+    background: rgba(51, 65, 85, 0.8);
+    color: #cbd5e1;
+    border: 1px solid rgba(148, 163, 184, 0.2);
+}
+
+[data-theme="dark"] .tab-btn.active {
+    background: rgba(71, 85, 105, 0.9);
+    color: #f1f5f9;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.3);
+}
+
+[data-theme="dark"] .tab-btn:hover:not(.active) {
+    background: rgba(64, 75, 95, 0.8);
+    color: #f1f5f9;
+}
+
+/* Remove allocation buttons and similar - dark mode */
+[data-theme="dark"] .remove-allocation,
+[data-theme="dark"] .remove-leg,
+[data-theme="dark"] .btn-remove {
+    background: rgba(239, 68, 68, 0.2);
+    color: #fca5a5;
+    border: 1px solid rgba(239, 68, 68, 0.3);
+}
+
+[data-theme="dark"] .remove-allocation:hover,
+[data-theme="dark"] .remove-leg:hover,
+[data-theme="dark"] .btn-remove:hover {
+    background: rgba(239, 68, 68, 0.3);
+    color: #fef2f2;
+}
+
+/* Allocation percent inputs - dark mode */
+[data-theme="dark"] .allocation-percent {
+    background: rgba(51, 65, 85, 0.8) !important;
+    border: 2px solid rgba(148, 163, 184, 0.3) !important;
+    color: #f1f5f9 !important;
+}
+
+[data-theme="dark"] .allocation-percent::placeholder {
+    color: #64748b !important;
+}
+
+/* Options strategy inputs - dark mode */
+[data-theme="dark"] .leg-quantity,
+[data-theme="dark"] .leg-strike,
+[data-theme="dark"] .leg-premium {
+    background: rgba(51, 65, 85, 0.8) !important;
+    border: 2px solid rgba(148, 163, 184, 0.3) !important;
+    color: #f1f5f9 !important;
+}
+
+[data-theme="dark"] .leg-quantity::placeholder,
+[data-theme="dark"] .leg-strike::placeholder,
+[data-theme="dark"] .leg-premium::placeholder {
+    color: #64748b !important;
+}
+
 body {
     font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
     background: linear-gradient(135deg, var(--bg-gradient-start) 0%, var(--bg-gradient-end) 100%);
