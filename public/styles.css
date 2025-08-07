@@ -5,12 +5,74 @@
     box-sizing: border-box;
 }
 
+/* CSS Variables for Theming */
+:root {
+    /* Light Theme Colors */
+    --bg-gradient-start: #667eea;
+    --bg-gradient-end: #764ba2;
+    --bg-primary: rgba(255, 255, 255, 0.95);
+    --bg-secondary: rgba(255, 255, 255, 0.8);
+    --bg-tertiary: rgba(248, 250, 252, 0.8);
+    --bg-card: linear-gradient(135deg, #f8f9ff, #e8eaff);
+    --bg-chart: linear-gradient(135deg, rgba(102, 126, 234, 0.03), rgba(118, 75, 162, 0.03));
+    
+    --text-primary: #333;
+    --text-secondary: #666;
+    --text-tertiary: #999;
+    --text-accent: #667eea;
+    --text-summary: #333;
+    
+    --border-light: rgba(102, 126, 234, 0.1);
+    --border-medium: rgba(102, 126, 234, 0.2);
+    --border-strong: rgba(102, 126, 234, 0.3);
+    
+    --shadow-light: 0 4px 15px rgba(0, 0, 0, 0.1);
+    --shadow-medium: 0 8px 25px rgba(102, 126, 234, 0.15);
+    --shadow-strong: 0 8px 32px rgba(0, 0, 0, 0.1);
+    
+    --positive-color: #059669;
+    --negative-color: #dc2626;
+    --positive-bg: rgba(5, 150, 105, 0.1);
+    --negative-bg: rgba(220, 38, 38, 0.1);
+}
+
+[data-theme="dark"] {
+    /* Dark Theme Colors */
+    --bg-gradient-start: #1a1a2e;
+    --bg-gradient-end: #16213e;
+    --bg-primary: rgba(30, 41, 59, 0.95);
+    --bg-secondary: rgba(30, 41, 59, 0.8);
+    --bg-tertiary: rgba(51, 65, 85, 0.8);
+    --bg-card: linear-gradient(135deg, #334155, #475569);
+    --bg-chart: linear-gradient(135deg, rgba(51, 65, 85, 0.3), rgba(71, 85, 105, 0.3));
+    
+    --text-primary: #f1f5f9;
+    --text-secondary: #cbd5e1;
+    --text-tertiary: #94a3b8;
+    --text-accent: #60a5fa;
+    --text-summary: #64748b;
+    
+    --border-light: rgba(148, 163, 184, 0.2);
+    --border-medium: rgba(148, 163, 184, 0.3);
+    --border-strong: rgba(148, 163, 184, 0.4);
+    
+    --shadow-light: 0 4px 15px rgba(0, 0, 0, 0.3);
+    --shadow-medium: 0 8px 25px rgba(0, 0, 0, 0.4);
+    --shadow-strong: 0 8px 32px rgba(0, 0, 0, 0.5);
+    
+    --positive-color: #10b981;
+    --negative-color: #ef4444;
+    --positive-bg: rgba(16, 185, 129, 0.2);
+    --negative-bg: rgba(239, 68, 68, 0.2);
+}
+
 body {
     font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
-    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    background: linear-gradient(135deg, var(--bg-gradient-start) 0%, var(--bg-gradient-end) 100%);
     min-height: 100vh;
-    color: #333;
+    color: var(--text-primary);
     line-height: 1.6;
+    transition: all 0.3s ease;
 }
 
 .container {
@@ -21,12 +83,13 @@ body {
 
 /* Header */
 .header {
-    background: rgba(255, 255, 255, 0.95);
+    background: var(--bg-primary);
     backdrop-filter: blur(10px);
     border-radius: 20px;
     padding: 30px;
     margin-bottom: 30px;
-    box-shadow: 0 8px 32px rgba(0, 0, 0, 0.1);
+    box-shadow: var(--shadow-strong);
+    border: 1px solid var(--border-light);
 }
 
 .header-content {
@@ -35,6 +98,48 @@ body {
     align-items: center;
     flex-wrap: wrap;
     gap: 20px;
+}
+
+.header-left {
+    display: flex;
+    align-items: center;
+    gap: 20px;
+}
+
+/* Theme Toggle Button */
+.theme-toggle {
+    background: var(--bg-secondary);
+    border: 2px solid var(--border-medium);
+    border-radius: 50%;
+    width: 50px;
+    height: 50px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    font-size: 1.2rem;
+    color: var(--text-accent);
+    box-shadow: var(--shadow-light);
+}
+
+.theme-toggle:hover {
+    background: var(--text-accent);
+    color: white;
+    transform: translateY(-2px);
+    box-shadow: var(--shadow-medium);
+}
+
+.theme-toggle:active {
+    transform: translateY(0);
+}
+
+.theme-toggle i {
+    transition: transform 0.3s ease;
+}
+
+.theme-toggle:hover i {
+    transform: scale(1.1);
 }
 
 .header h1 {
@@ -59,7 +164,7 @@ body {
 
 .last-updated {
     font-size: 0.9rem;
-    color: #666;
+    color: var(--text-secondary);
     font-weight: 500;
 }
 
@@ -90,26 +195,27 @@ body {
 
 /* Sections */
 section {
-    background: rgba(255, 255, 255, 0.95);
+    background: var(--bg-primary);
     backdrop-filter: blur(10px);
     border-radius: 20px;
     padding: 30px;
     margin-bottom: 30px;
-    box-shadow: 0 8px 32px rgba(0, 0, 0, 0.1);
+    box-shadow: var(--shadow-strong);
+    border: 1px solid var(--border-light);
 }
 
 section h2 {
     font-size: 1.8rem;
     font-weight: 600;
     margin-bottom: 25px;
-    color: #333;
+    color: var(--text-primary);
     display: flex;
     align-items: center;
     gap: 12px;
 }
 
 section h2 i {
-    color: #667eea;
+    color: var(--text-accent);
 }
 
 /* Market Overview */
@@ -120,23 +226,23 @@ section h2 i {
 }
 
 .index-card {
-    background: linear-gradient(135deg, #f8f9ff, #e8eaff);
+    background: var(--bg-card);
     border-radius: 16px;
     padding: 24px;
     text-align: center;
     transition: transform 0.3s ease;
-    border: 1px solid rgba(102, 126, 234, 0.1);
+    border: 1px solid var(--border-light);
 }
 
 .index-card:hover {
     transform: translateY(-5px);
-    box-shadow: 0 12px 40px rgba(102, 126, 234, 0.15);
+    box-shadow: var(--shadow-medium);
 }
 
 .index-symbol {
     font-size: 1.2rem;
     font-weight: 700;
-    color: #333;
+    color: var(--text-primary);
     margin-bottom: 8px;
 }
 
@@ -154,13 +260,13 @@ section h2 i {
 }
 
 .positive {
-    color: #059669;
-    background: rgba(5, 150, 105, 0.1);
+    color: var(--positive-color);
+    background: var(--positive-bg);
 }
 
 .negative {
-    color: #dc2626;
-    background: rgba(220, 38, 38, 0.1);
+    color: var(--negative-color);
+    background: var(--negative-bg);
 }
 
 
@@ -273,10 +379,11 @@ section h2 i {
 
 /* AI Summary */
 .summary-card {
-    background: linear-gradient(135deg, #f0f9ff, #e0f2fe);
+    background: var(--bg-card);
     border-radius: 16px;
     padding: 30px;
-    border-left: 6px solid #667eea;
+    border-left: 6px solid var(--text-accent);
+    border: 1px solid var(--border-light);
 }
 
 .sentiment-indicator {
@@ -293,24 +400,30 @@ section h2 i {
 }
 
 .sentiment-badge.bullish {
-    background: rgba(5, 150, 105, 0.2);
-    color: #059669;
+    background: var(--positive-bg);
+    color: var(--positive-color);
 }
 
 .sentiment-badge.bearish {
-    background: rgba(220, 38, 38, 0.2);
-    color: #dc2626;
+    background: var(--negative-bg);
+    color: var(--negative-color);
 }
 
 .sentiment-badge.neutral {
     background: rgba(107, 114, 128, 0.2);
-    color: #6b7280;
+    color: var(--text-secondary);
 }
 
 .summary-content {
     font-size: 1.1rem;
     line-height: 1.8;
     margin-bottom: 25px;
+    color: var(--text-summary);
+}
+
+.summary-content p {
+    color: var(--text-summary);
+    margin-bottom: 15px;
 }
 
 .key-points {
@@ -319,11 +432,13 @@ section h2 i {
 }
 
 .key-point {
-    background: rgba(255, 255, 255, 0.7);
+    background: var(--bg-secondary);
     border-radius: 10px;
     padding: 15px;
-    border-left: 4px solid #667eea;
+    border-left: 4px solid var(--text-accent);
     font-size: 0.95rem;
+    color: var(--text-primary);
+    border: 1px solid var(--border-light);
 }
 
 /* Top Movers */
@@ -355,29 +470,31 @@ section h2 i {
 }
 
 .stock-item {
-    background: rgba(255, 255, 255, 0.7);
+    background: var(--bg-secondary);
     border-radius: 12px;
     padding: 20px;
     display: flex;
     justify-content: space-between;
     align-items: center;
     transition: transform 0.2s ease;
+    border: 1px solid var(--border-light);
 }
 
 .stock-item:hover {
     transform: translateX(5px);
-    box-shadow: 0 5px 20px rgba(0, 0, 0, 0.1);
+    box-shadow: var(--shadow-light);
 }
 
 .stock-info h4 {
     font-size: 1.1rem;
     font-weight: 600;
     margin-bottom: 4px;
+    color: var(--text-primary);
 }
 
 .stock-price {
     font-size: 1rem;
-    color: #666;
+    color: var(--text-secondary);
 }
 
 .stock-change {
@@ -608,6 +725,18 @@ section h2 i {
         text-align: center;
     }
     
+    .header-left {
+        gap: 15px;
+        justify-content: center;
+        width: 100%;
+    }
+    
+    .theme-toggle {
+        width: 45px;
+        height: 45px;
+        font-size: 1.1rem;
+    }
+    
     .movers-grid {
         grid-template-columns: 1fr;
     }
@@ -665,7 +794,11 @@ section h2 i {
 
 /* Company Search Styles */
 .company-search {
-    background: linear-gradient(135deg, #f0f9ff, #e0f2fe);
+    background: var(--bg-card);
+}
+
+.company-search h2 {
+    color: var(--text-summary);
 }
 
 .search-container {
