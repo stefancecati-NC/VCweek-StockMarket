@@ -30,10 +30,10 @@
     --shadow-medium: 0 8px 25px rgba(102, 126, 234, 0.15);
     --shadow-strong: 0 8px 32px rgba(0, 0, 0, 0.1);
     
-    --positive-color: #059669;
+    --positive-color: #047857;
     --negative-color: #dc2626;
-    --positive-bg: rgba(5, 150, 105, 0.1);
-    --negative-bg: rgba(220, 38, 38, 0.1);
+    --positive-bg: rgba(5, 150, 105, 0.15);
+    --negative-bg: rgba(220, 38, 38, 0.15);
 }
 
 [data-theme="dark"] {
@@ -60,10 +60,10 @@
     --shadow-medium: 0 8px 25px rgba(0, 0, 0, 0.4);
     --shadow-strong: 0 8px 32px rgba(0, 0, 0, 0.5);
     
-    --positive-color: #10b981;
-    --negative-color: #ef4444;
-    --positive-bg: rgba(16, 185, 129, 0.2);
-    --negative-bg: rgba(239, 68, 68, 0.2);
+    --positive-color: #22c55e;
+    --negative-color: #f87171;
+    --positive-bg: rgba(34, 197, 94, 0.25);
+    --negative-bg: rgba(248, 113, 113, 0.25);
 }
 
 /* Dark mode specific overrides */
@@ -441,6 +441,48 @@
 [data-theme="dark"] .leg-strike::placeholder,
 [data-theme="dark"] .leg-premium::placeholder {
     color: #64748b !important;
+}
+
+/* Enhanced sentiment contrast in dark mode */
+[data-theme="dark"] .sentiment-badge.positive {
+    background: rgba(34, 197, 94, 0.3);
+    color: #4ade80;
+    border: 1px solid rgba(34, 197, 94, 0.4);
+    text-shadow: 0 1px 2px rgba(0, 0, 0, 0.3);
+}
+
+[data-theme="dark"] .sentiment-badge.negative {
+    background: rgba(248, 113, 113, 0.3);
+    color: #fca5a5;
+    border: 1px solid rgba(248, 113, 113, 0.4);
+    text-shadow: 0 1px 2px rgba(0, 0, 0, 0.3);
+}
+
+[data-theme="dark"] .sentiment-badge.neutral {
+    background: rgba(148, 163, 184, 0.3);
+    color: #cbd5e1;
+    border: 1px solid rgba(148, 163, 184, 0.4);
+    text-shadow: 0 1px 2px rgba(0, 0, 0, 0.3);
+}
+
+[data-theme="dark"] .stat-number.positive {
+    color: #4ade80;
+    text-shadow: 0 1px 3px rgba(34, 197, 94, 0.4);
+}
+
+[data-theme="dark"] .stat-number.negative {
+    color: #fca5a5;
+    text-shadow: 0 1px 3px rgba(248, 113, 113, 0.4);
+}
+
+[data-theme="dark"] .positive {
+    color: #4ade80;
+    background: rgba(34, 197, 94, 0.25);
+}
+
+[data-theme="dark"] .negative {
+    color: #fca5a5;
+    background: rgba(248, 113, 113, 0.25);
 }
 
 body {
@@ -1985,11 +2027,15 @@ section h2 i {
 }
 
 .stat-number.positive {
-    color: #059669;
+    color: #047857;
+    font-weight: 700;
+    text-shadow: 0 1px 2px rgba(5, 150, 105, 0.2);
 }
 
 .stat-number.negative {
-    color: #dc2626;
+    color: #b91c1c;
+    font-weight: 700;
+    text-shadow: 0 1px 2px rgba(220, 38, 38, 0.2);
 }
 
 .stat-label {
@@ -2004,18 +2050,24 @@ section h2 i {
 }
 
 .sentiment-badge.positive {
-    background: rgba(5, 150, 105, 0.2);
-    color: #059669;
+    background: rgba(5, 150, 105, 0.25);
+    color: #047857;
+    font-weight: 600;
+    border: 1px solid rgba(5, 150, 105, 0.3);
 }
 
 .sentiment-badge.negative {
-    background: rgba(220, 38, 38, 0.2);
-    color: #dc2626;
+    background: rgba(220, 38, 38, 0.25);
+    color: #b91c1c;
+    font-weight: 600;
+    border: 1px solid rgba(220, 38, 38, 0.3);
 }
 
 .sentiment-badge.neutral {
-    background: rgba(107, 114, 128, 0.2);
-    color: #6b7280;
+    background: rgba(107, 114, 128, 0.25);
+    color: #4b5563;
+    font-weight: 600;
+    border: 1px solid rgba(107, 114, 128, 0.3);
 }
 
 .news-list {
