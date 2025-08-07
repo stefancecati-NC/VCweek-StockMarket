@@ -6,6 +6,7 @@ class StockMarketApp {
     }
 
     init() {
+        this.initTheme();
         this.bindEventListeners();
         this.loadInitialData();
         this.bindNewEventListeners();
@@ -17,6 +18,11 @@ class StockMarketApp {
     }
 
     bindEventListeners() {
+        // Theme toggle button
+        document.getElementById('themeToggle').addEventListener('click', () => {
+            this.toggleTheme();
+        });
+
         // Refresh button
         document.getElementById('refreshBtn').addEventListener('click', () => {
             this.refreshAllData();
@@ -45,6 +51,34 @@ class StockMarketApp {
                 this.hideErrorModal();
             }
         });
+    }
+
+    // Theme Management
+    initTheme() {
+        // Check for saved theme preference or default to 'light'
+        const savedTheme = localStorage.getItem('theme') || 'light';
+        this.setTheme(savedTheme);
+    }
+
+    toggleTheme() {
+        const currentTheme = document.documentElement.getAttribute('data-theme');
+        const newTheme = currentTheme === 'dark' ? 'light' : 'dark';
+        this.setTheme(newTheme);
+    }
+
+    setTheme(theme) {
+        document.documentElement.setAttribute('data-theme', theme);
+        localStorage.setItem('theme', theme);
+        
+        // Update toggle button icon
+        const toggleButton = document.getElementById('themeToggle');
+        const icon = toggleButton.querySelector('i');
+        
+        if (theme === 'dark') {
+            icon.className = 'fas fa-sun';
+        } else {
+            icon.className = 'fas fa-moon';
+        }
     }
 
     async loadInitialData() {
@@ -1539,7 +1573,7 @@ class StockMarketApp {
         } else if (total > 100) {
             totalElement.style.color = '#ef4444'; // Red
         } else {
-            totalElement.style.color = '#f59e0b'; // Orange
+                            totalElement.style.color = '#3b82f6'; // Blue
         }
     }
 

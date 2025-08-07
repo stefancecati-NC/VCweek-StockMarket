@@ -5,12 +5,592 @@
     box-sizing: border-box;
 }
 
+/* CSS Variables for Theming */
+:root {
+    /* Light Theme Colors */
+    --bg-gradient-start: #667eea;
+    --bg-gradient-end: #764ba2;
+    --bg-primary: rgba(255, 255, 255, 0.95);
+    --bg-secondary: rgba(255, 255, 255, 0.8);
+    --bg-tertiary: rgba(248, 250, 252, 0.8);
+    --bg-card: linear-gradient(135deg, #f8f9ff, #e8eaff);
+    --bg-chart: linear-gradient(135deg, rgba(102, 126, 234, 0.03), rgba(118, 75, 162, 0.03));
+    
+    --text-primary: #333;
+    --text-secondary: #666;
+    --text-tertiary: #999;
+    --text-accent: #667eea;
+    --text-summary: #333;
+    
+    --border-light: rgba(102, 126, 234, 0.1);
+    --border-medium: rgba(102, 126, 234, 0.2);
+    --border-strong: rgba(102, 126, 234, 0.3);
+    
+    --shadow-light: 0 4px 15px rgba(0, 0, 0, 0.1);
+    --shadow-medium: 0 8px 25px rgba(102, 126, 234, 0.15);
+    --shadow-strong: 0 8px 32px rgba(0, 0, 0, 0.1);
+    
+    --positive-color: #047857;
+    --negative-color: #dc2626;
+    --positive-bg: rgba(5, 150, 105, 0.15);
+    --negative-bg: rgba(220, 38, 38, 0.15);
+}
+
+[data-theme="dark"] {
+    /* Dark Theme Colors */
+    --bg-gradient-start: #1a1a2e;
+    --bg-gradient-end: #16213e;
+    --bg-primary: rgba(30, 41, 59, 0.95);
+    --bg-secondary: rgba(30, 41, 59, 0.8);
+    --bg-tertiary: rgba(51, 65, 85, 0.8);
+    --bg-card: linear-gradient(135deg, #334155, #475569);
+    --bg-chart: linear-gradient(135deg, rgba(51, 65, 85, 0.3), rgba(71, 85, 105, 0.3));
+    
+    --text-primary: #f1f5f9;
+    --text-secondary: #cbd5e1;
+    --text-tertiary: #94a3b8;
+    --text-accent: #60a5fa;
+    --text-summary: #64748b;
+    
+    --border-light: rgba(148, 163, 184, 0.2);
+    --border-medium: rgba(148, 163, 184, 0.3);
+    --border-strong: rgba(148, 163, 184, 0.4);
+    
+    --shadow-light: 0 4px 15px rgba(0, 0, 0, 0.3);
+    --shadow-medium: 0 8px 25px rgba(0, 0, 0, 0.4);
+    --shadow-strong: 0 8px 32px rgba(0, 0, 0, 0.5);
+    
+    --positive-color: #22c55e;
+    --negative-color: #f87171;
+    --positive-bg: rgba(34, 197, 94, 0.25);
+    --negative-bg: rgba(248, 113, 113, 0.25);
+}
+
+/* Dark mode specific overrides */
+[data-theme="dark"] .ai-summary {
+    background: rgba(30, 41, 59, 0.95);
+    backdrop-filter: blur(10px);
+    border-radius: 20px;
+    padding: 30px;
+    border: 1px solid rgba(148, 163, 184, 0.2);
+    box-shadow: 0 8px 32px rgba(0, 0, 0, 0.5);
+    color: #f1f5f9;
+}
+
+[data-theme="dark"] .ai-summary h2 {
+    color: #f1f5f9;
+}
+
+[data-theme="dark"] .ai-summary .summary-card {
+    background: rgba(51, 65, 85, 0.8);
+    border: 1px solid rgba(148, 163, 184, 0.2);
+}
+
+[data-theme="dark"] .ai-summary .summary-content {
+    color: #cbd5e1;
+}
+
+[data-theme="dark"] .ai-summary .summary-content p {
+    color: #cbd5e1;
+}
+
+[data-theme="dark"] .ai-summary .sentiment-badge {
+    color: #f1f5f9;
+}
+
+[data-theme="dark"] .charts-header h3 {
+    color: #f1f5f9;
+}
+
+[data-theme="dark"] .chart-container {
+    background: linear-gradient(135deg, #334155, #475569);
+    border: 1px solid rgba(148, 163, 184, 0.2);
+}
+
+[data-theme="dark"] .chart-container:hover {
+    box-shadow: 0 8px 30px rgba(0, 0, 0, 0.4);
+}
+
+[data-theme="dark"] .chart-title {
+    color: #f1f5f9;
+}
+
+[data-theme="dark"] .earnings-item {
+    background: linear-gradient(135deg, #334155, #475569);
+    border: 1px solid rgba(148, 163, 184, 0.2);
+}
+
+[data-theme="dark"] .earnings-company h4 {
+    color: #f1f5f9;
+}
+
+[data-theme="dark"] .earnings-symbol {
+    color: #cbd5e1;
+}
+
+/* Hide "Show next:" label in earnings filter */
+.earnings-filter label[for="daysFilter"] {
+    display: none;
+}
+
+[data-theme="dark"] .earnings-eps {
+    background: rgba(51, 65, 85, 0.8);
+    color: #f1f5f9;
+}
+
+[data-theme="dark"] .earnings-eps strong {
+    color: #60a5fa;
+}
+
+[data-theme="dark"] .earnings-filter select {
+    background: rgba(51, 65, 85, 0.8);
+    border: 2px solid rgba(148, 163, 184, 0.3);
+    color: #f1f5f9;
+}
+
+[data-theme="dark"] .earnings-filter select option {
+    background: #334155;
+    color: #f1f5f9;
+}
+
+[data-theme="dark"] .major-stock-card {
+    background: linear-gradient(135deg, #334155, #475569);
+    border: 2px solid rgba(148, 163, 184, 0.2);
+}
+
+[data-theme="dark"] .major-stock-card:hover {
+    border-color: #60a5fa;
+    box-shadow: 0 12px 40px rgba(0, 0, 0, 0.4);
+}
+
+[data-theme="dark"] .stock-symbol {
+    color: #f1f5f9;
+}
+
+[data-theme="dark"] .stock-price-large {
+    color: #f1f5f9;
+}
+
+/* Company Analysis - lighter in dark mode */
+[data-theme="dark"] .company-search {
+    background: rgba(71, 85, 105, 0.6);
+}
+
+[data-theme="dark"] .company-search h2 {
+    color: #f1f5f9;
+}
+
+/* News-sentiment section - darker in dark mode */
+[data-theme="dark"] .news-sentiment {
+    background: rgba(30, 41, 59, 0.95);
+    border: 1px solid rgba(148, 163, 184, 0.2);
+    border-radius: 20px;
+    padding: 30px;
+}
+
+/* Options trading section - darker in dark mode */
+[data-theme="dark"] .options-trading {
+    background: rgba(30, 41, 59, 0.95);
+    border: 1px solid rgba(148, 163, 184, 0.2);
+}
+
+/* Investment simulator - darker in dark mode */
+[data-theme="dark"] .investment-simulator {
+    background: rgba(30, 41, 59, 0.95);
+    border: 1px solid rgba(148, 163, 184, 0.2);
+}
+
+/* Investment simulator form labels - lighter in dark mode */
+[data-theme="dark"] .investment-simulator .form-group label {
+    color: #f1f5f9;
+    font-weight: 500;
+}
+
+/* Investment simulator select options - lighter in dark mode */
+[data-theme="dark"] .investment-simulator .form-group select {
+    background: rgba(51, 65, 85, 0.8);
+    border: 2px solid rgba(148, 163, 184, 0.3);
+    color: #f1f5f9;
+}
+
+[data-theme="dark"] .investment-simulator .form-group select option {
+    background: #334155;
+    color: #f1f5f9;
+}
+
+/* Investment simulator number input arrows - lighter in dark mode */
+[data-theme="dark"] .investment-simulator .form-group input[type="number"]::-webkit-outer-spin-button,
+[data-theme="dark"] .investment-simulator .form-group input[type="number"]::-webkit-inner-spin-button {
+    -webkit-appearance: none;
+    appearance: none;
+    background: rgba(71, 85, 105, 0.8);
+    border-left: 1px solid rgba(148, 163, 184, 0.3);
+    cursor: pointer;
+    display: block;
+    height: 22px;
+    position: relative;
+    right: 2px;
+    width: 16px;
+    border-radius: 0 4px 4px 0;
+}
+
+[data-theme="dark"] .investment-simulator .form-group input[type="number"] {
+    -moz-appearance: textfield;
+    background: rgba(51, 65, 85, 0.8);
+    border: 2px solid rgba(148, 163, 184, 0.3);
+    color: #f1f5f9;
+}
+
+/* Custom arrows for better visibility */
+[data-theme="dark"] .investment-simulator .form-group input[type="number"]::-webkit-inner-spin-button {
+    background-image: 
+        linear-gradient(45deg, transparent 50%, #cbd5e1 50%),
+        linear-gradient(135deg, transparent 50%, #cbd5e1 50%);
+    background-position: 
+        calc(50% - 2px) calc(50% - 1px),
+        calc(50% + 2px) calc(50% - 1px);
+    background-size: 4px 4px;
+    background-repeat: no-repeat;
+}
+
+[data-theme="dark"] .investment-simulator .form-group input[type="number"]::-webkit-inner-spin-button:hover {
+    background-color: rgba(96, 165, 250, 0.2);
+}
+
+/* Search input placeholder - darker in dark mode */
+[data-theme="dark"] .search-container input {
+    background: rgba(51, 65, 85, 0.8);
+    border: 2px solid rgba(148, 163, 184, 0.3);
+    color: #f1f5f9;
+}
+
+[data-theme="dark"] .search-container input::placeholder {
+    color: #a1a1aa;
+}
+
+[data-theme="dark"] .search-container input:focus {
+    border-color: #60a5fa;
+    box-shadow: 0 0 0 3px rgba(96, 165, 250, 0.1);
+}
+
+/* News articles in sentiment section - darker in dark mode */
+[data-theme="dark"] .news-article {
+    background: rgba(51, 65, 85, 0.8);
+    border-left: 4px solid #3b82f6;
+}
+
+[data-theme="dark"] .news-article:hover {
+    box-shadow: 0 8px 25px rgba(0, 0, 0, 0.4);
+}
+
+/* Portfolio management - a little more darker in dark mode */
+[data-theme="dark"] .portfolio-management {
+    background: rgba(30, 41, 59, 0.85);
+    border: 1px solid rgba(148, 163, 184, 0.2);
+}
+
+[data-theme="dark"] .portfolio-management h2 {
+    color: #f1f5f9;
+}
+
+[data-theme="dark"] .portfolio-management h3 {
+    color: #f1f5f9;
+}
+
+/* Error modal and modals - dark mode */
+[data-theme="dark"] .modal-content {
+    background-color: rgba(30, 41, 59, 0.95);
+    color: #f1f5f9;
+    border: 1px solid rgba(148, 163, 184, 0.2);
+}
+
+[data-theme="dark"] .modal-content h3 {
+    color: #f1f5f9;
+}
+
+[data-theme="dark"] .modal-content p {
+    color: #e2e8f0;
+    font-weight: 500;
+}
+
+[data-theme="dark"] .close {
+    color: #94a3b8;
+}
+
+[data-theme="dark"] .close:hover {
+    color: #f1f5f9;
+}
+
+/* Error message text - darker and more prominent */
+[data-theme="dark"] #errorMessage {
+    color: #f8fafc;
+    font-weight: 600;
+    font-size: 1.1rem;
+}
+
+/* Light mode error message - ensure it's dark enough */
+#errorMessage {
+    color: #1f2937;
+    font-weight: 600;
+    font-size: 1.1rem;
+}
+
+/* Stat cards - darker in dark mode */
+[data-theme="dark"] .stat-card {
+    background: rgba(51, 65, 85, 0.8);
+    border: 1px solid rgba(148, 163, 184, 0.2);
+}
+
+[data-theme="dark"] .stat-card:hover {
+    box-shadow: 0 8px 25px rgba(0, 0, 0, 0.4);
+}
+
+[data-theme="dark"] .stat-card h3 {
+    color: #cbd5e1;
+}
+
+[data-theme="dark"] .stat-value {
+    color: #f1f5f9;
+}
+
+/* News summary - darker in dark mode */
+[data-theme="dark"] .news-summary {
+    background: rgba(51, 65, 85, 0.8);
+    border: 1px solid rgba(148, 163, 184, 0.2);
+}
+
+/* News filters select (All Categories dropdown) - darker in dark mode */
+[data-theme="dark"] .news-filters select {
+    background: rgba(51, 65, 85, 0.8);
+    border: 2px solid rgba(148, 163, 184, 0.3);
+    color: #f1f5f9;
+}
+
+[data-theme="dark"] .news-filters select option {
+    background: #334155;
+    color: #f1f5f9;
+}
+
+/* Article titles in news & sentiment analysis - lighter in dark mode */
+[data-theme="dark"] .article-title {
+    color: #f1f5f9;
+}
+
+/* Future Investment Projection buttons - darker in dark mode */
+[data-theme="dark"] .simulator-tabs .tab-btn {
+    background: rgba(51, 65, 85, 0.8);
+    color: #cbd5e1;
+    border: 1px solid rgba(148, 163, 184, 0.2);
+}
+
+[data-theme="dark"] .simulator-tabs .tab-btn:hover {
+    background: rgba(71, 85, 105, 0.9);
+    color: #f1f5f9;
+}
+
+[data-theme="dark"] .simulator-tabs .tab-btn.active {
+    background: linear-gradient(135deg, #475569, #334155);
+    color: #f1f5f9;
+    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.3);
+}
+
+[data-theme="dark"] .btn-primary {
+    background: linear-gradient(135deg, #475569, #334155);
+    border: 1px solid rgba(148, 163, 184, 0.2);
+}
+
+[data-theme="dark"] .btn-primary:hover {
+    box-shadow: 0 8px 25px rgba(0, 0, 0, 0.4);
+}
+
+/* Article descriptions (like oil futures text) - lighter in dark mode */
+[data-theme="dark"] .article-description {
+    color: #cbd5e1;
+}
+
+/* Options trading form labels (Symbol and Expiration) - lighter in dark mode */
+[data-theme="dark"] .options-trading .form-group label {
+    color: #f1f5f9;
+}
+
+/* Future Investment Projection input placeholders - darker in dark mode */
+[data-theme="dark"] .investment-simulator .form-group input {
+    background: rgba(51, 65, 85, 0.8);
+    border: 2px solid rgba(148, 163, 184, 0.3);
+    color: #f1f5f9;
+}
+
+[data-theme="dark"] .investment-simulator .form-group input::placeholder {
+    color: #64748b;
+}
+
+[data-theme="dark"] .investment-simulator .form-group input:focus {
+    border-color: #60a5fa;
+    box-shadow: 0 0 0 3px rgba(96, 165, 250, 0.1);
+}
+
+/* All form inputs and placeholders - dark mode */
+[data-theme="dark"] .form-group input,
+[data-theme="dark"] .form-group select {
+    background: rgba(51, 65, 85, 0.8);
+    border: 2px solid rgba(148, 163, 184, 0.3);
+    color: #f1f5f9;
+}
+
+[data-theme="dark"] .form-group input::placeholder {
+    color: #64748b;
+}
+
+[data-theme="dark"] .form-group input:focus,
+[data-theme="dark"] .form-group select:focus {
+    border-color: #60a5fa;
+    box-shadow: 0 0 0 3px rgba(96, 165, 250, 0.1);
+}
+
+[data-theme="dark"] .form-group select option {
+    background: #334155;
+    color: #f1f5f9;
+}
+
+/* Secondary buttons - dark mode */
+[data-theme="dark"] .btn-secondary {
+    background: rgba(51, 65, 85, 0.8);
+    color: #f1f5f9;
+    border: 2px solid rgba(148, 163, 184, 0.3);
+}
+
+[data-theme="dark"] .btn-secondary:hover {
+    background: rgba(71, 85, 105, 0.9);
+    border-color: #60a5fa;
+}
+
+/* Timeframe buttons - dark mode */
+[data-theme="dark"] .timeframe-btn {
+    background: rgba(51, 65, 85, 0.8);
+    color: #cbd5e1;
+    border: 1px solid rgba(148, 163, 184, 0.2);
+}
+
+[data-theme="dark"] .timeframe-btn:hover {
+    background: rgba(71, 85, 105, 0.9);
+    color: #f1f5f9;
+}
+
+[data-theme="dark"] .timeframe-btn.active {
+    background: linear-gradient(135deg, #475569, #334155);
+    color: #f1f5f9;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.3);
+}
+
+/* General tab buttons - dark mode */
+[data-theme="dark"] .tab-btn {
+    background: rgba(51, 65, 85, 0.8);
+    color: #cbd5e1;
+    border: 1px solid rgba(148, 163, 184, 0.2);
+}
+
+[data-theme="dark"] .tab-btn.active {
+    background: rgba(71, 85, 105, 0.9);
+    color: #f1f5f9;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.3);
+}
+
+[data-theme="dark"] .tab-btn:hover:not(.active) {
+    background: rgba(64, 75, 95, 0.8);
+    color: #f1f5f9;
+}
+
+/* Remove allocation buttons and similar - dark mode */
+[data-theme="dark"] .remove-allocation,
+[data-theme="dark"] .remove-leg,
+[data-theme="dark"] .btn-remove {
+    background: rgba(239, 68, 68, 0.2);
+    color: #fca5a5;
+    border: 1px solid rgba(239, 68, 68, 0.3);
+}
+
+[data-theme="dark"] .remove-allocation:hover,
+[data-theme="dark"] .remove-leg:hover,
+[data-theme="dark"] .btn-remove:hover {
+    background: rgba(239, 68, 68, 0.3);
+    color: #fef2f2;
+}
+
+/* Allocation percent inputs - dark mode */
+[data-theme="dark"] .allocation-percent {
+    background: rgba(51, 65, 85, 0.8) !important;
+    border: 2px solid rgba(148, 163, 184, 0.3) !important;
+    color: #f1f5f9 !important;
+}
+
+[data-theme="dark"] .allocation-percent::placeholder {
+    color: #64748b !important;
+}
+
+/* Options strategy inputs - dark mode */
+[data-theme="dark"] .leg-quantity,
+[data-theme="dark"] .leg-strike,
+[data-theme="dark"] .leg-premium {
+    background: rgba(51, 65, 85, 0.8) !important;
+    border: 2px solid rgba(148, 163, 184, 0.3) !important;
+    color: #f1f5f9 !important;
+}
+
+[data-theme="dark"] .leg-quantity::placeholder,
+[data-theme="dark"] .leg-strike::placeholder,
+[data-theme="dark"] .leg-premium::placeholder {
+    color: #64748b !important;
+}
+
+/* Enhanced sentiment contrast in dark mode */
+[data-theme="dark"] .sentiment-badge.positive {
+    background: rgba(34, 197, 94, 0.3);
+    color: #4ade80;
+    border: 1px solid rgba(34, 197, 94, 0.4);
+    text-shadow: 0 1px 2px rgba(0, 0, 0, 0.3);
+}
+
+[data-theme="dark"] .sentiment-badge.negative {
+    background: rgba(248, 113, 113, 0.3);
+    color: #fca5a5;
+    border: 1px solid rgba(248, 113, 113, 0.4);
+    text-shadow: 0 1px 2px rgba(0, 0, 0, 0.3);
+}
+
+[data-theme="dark"] .sentiment-badge.neutral {
+    background: rgba(148, 163, 184, 0.3);
+    color: #cbd5e1;
+    border: 1px solid rgba(148, 163, 184, 0.4);
+    text-shadow: 0 1px 2px rgba(0, 0, 0, 0.3);
+}
+
+[data-theme="dark"] .stat-number.positive {
+    color: #4ade80;
+    text-shadow: 0 1px 3px rgba(34, 197, 94, 0.4);
+}
+
+[data-theme="dark"] .stat-number.negative {
+    color: #fca5a5;
+    text-shadow: 0 1px 3px rgba(248, 113, 113, 0.4);
+}
+
+[data-theme="dark"] .positive {
+    color: #4ade80;
+    background: rgba(34, 197, 94, 0.25);
+}
+
+[data-theme="dark"] .negative {
+    color: #fca5a5;
+    background: rgba(248, 113, 113, 0.25);
+}
+
 body {
     font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
-    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    background: linear-gradient(135deg, var(--bg-gradient-start) 0%, var(--bg-gradient-end) 100%);
     min-height: 100vh;
-    color: #333;
+    color: var(--text-primary);
     line-height: 1.6;
+    transition: all 0.3s ease;
 }
 
 .container {
@@ -21,12 +601,13 @@ body {
 
 /* Header */
 .header {
-    background: rgba(255, 255, 255, 0.95);
+    background: var(--bg-primary);
     backdrop-filter: blur(10px);
     border-radius: 20px;
     padding: 30px;
     margin-bottom: 30px;
-    box-shadow: 0 8px 32px rgba(0, 0, 0, 0.1);
+    box-shadow: var(--shadow-strong);
+    border: 1px solid var(--border-light);
 }
 
 .header-content {
@@ -35,6 +616,48 @@ body {
     align-items: center;
     flex-wrap: wrap;
     gap: 20px;
+}
+
+.header-left {
+    display: flex;
+    align-items: center;
+    gap: 20px;
+}
+
+/* Theme Toggle Button */
+.theme-toggle {
+    background: var(--bg-secondary);
+    border: 2px solid var(--border-medium);
+    border-radius: 50%;
+    width: 50px;
+    height: 50px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    font-size: 1.2rem;
+    color: var(--text-accent);
+    box-shadow: var(--shadow-light);
+}
+
+.theme-toggle:hover {
+    background: var(--text-accent);
+    color: white;
+    transform: translateY(-2px);
+    box-shadow: var(--shadow-medium);
+}
+
+.theme-toggle:active {
+    transform: translateY(0);
+}
+
+.theme-toggle i {
+    transition: transform 0.3s ease;
+}
+
+.theme-toggle:hover i {
+    transform: scale(1.1);
 }
 
 .header h1 {
@@ -59,7 +682,7 @@ body {
 
 .last-updated {
     font-size: 0.9rem;
-    color: #666;
+    color: var(--text-secondary);
     font-weight: 500;
 }
 
@@ -90,26 +713,27 @@ body {
 
 /* Sections */
 section {
-    background: rgba(255, 255, 255, 0.95);
+    background: var(--bg-primary);
     backdrop-filter: blur(10px);
     border-radius: 20px;
     padding: 30px;
     margin-bottom: 30px;
-    box-shadow: 0 8px 32px rgba(0, 0, 0, 0.1);
+    box-shadow: var(--shadow-strong);
+    border: 1px solid var(--border-light);
 }
 
 section h2 {
     font-size: 1.8rem;
     font-weight: 600;
     margin-bottom: 25px;
-    color: #333;
+    color: var(--text-primary);
     display: flex;
     align-items: center;
     gap: 12px;
 }
 
 section h2 i {
-    color: #667eea;
+    color: var(--text-accent);
 }
 
 /* Market Overview */
@@ -120,23 +744,23 @@ section h2 i {
 }
 
 .index-card {
-    background: linear-gradient(135deg, #f8f9ff, #e8eaff);
+    background: var(--bg-card);
     border-radius: 16px;
     padding: 24px;
     text-align: center;
     transition: transform 0.3s ease;
-    border: 1px solid rgba(102, 126, 234, 0.1);
+    border: 1px solid var(--border-light);
 }
 
 .index-card:hover {
     transform: translateY(-5px);
-    box-shadow: 0 12px 40px rgba(102, 126, 234, 0.15);
+    box-shadow: var(--shadow-medium);
 }
 
 .index-symbol {
     font-size: 1.2rem;
     font-weight: 700;
-    color: #333;
+    color: var(--text-primary);
     margin-bottom: 8px;
 }
 
@@ -154,13 +778,13 @@ section h2 i {
 }
 
 .positive {
-    color: #059669;
-    background: rgba(5, 150, 105, 0.1);
+    color: var(--positive-color);
+    background: var(--positive-bg);
 }
 
 .negative {
-    color: #dc2626;
-    background: rgba(220, 38, 38, 0.1);
+    color: var(--negative-color);
+    background: var(--negative-bg);
 }
 
 
@@ -232,7 +856,7 @@ section h2 i {
 }
 
 .chart-container {
-    background: linear-gradient(135deg, #f8f9ff, #e8eaff);
+    background: linear-gradient(135deg, #fefefe, #f8f9fa);
     border-radius: 16px;
     padding: 20px;
     border: 1px solid rgba(102, 126, 234, 0.1);
@@ -273,10 +897,11 @@ section h2 i {
 
 /* AI Summary */
 .summary-card {
-    background: linear-gradient(135deg, #f0f9ff, #e0f2fe);
+    background: var(--bg-card);
     border-radius: 16px;
     padding: 30px;
-    border-left: 6px solid #667eea;
+    border-left: 6px solid var(--text-accent);
+    border: 1px solid var(--border-light);
 }
 
 .sentiment-indicator {
@@ -293,24 +918,30 @@ section h2 i {
 }
 
 .sentiment-badge.bullish {
-    background: rgba(5, 150, 105, 0.2);
-    color: #059669;
+    background: var(--positive-bg);
+    color: var(--positive-color);
 }
 
 .sentiment-badge.bearish {
-    background: rgba(220, 38, 38, 0.2);
-    color: #dc2626;
+    background: var(--negative-bg);
+    color: var(--negative-color);
 }
 
 .sentiment-badge.neutral {
     background: rgba(107, 114, 128, 0.2);
-    color: #6b7280;
+    color: var(--text-secondary);
 }
 
 .summary-content {
     font-size: 1.1rem;
     line-height: 1.8;
     margin-bottom: 25px;
+    color: var(--text-summary);
+}
+
+.summary-content p {
+    color: var(--text-summary);
+    margin-bottom: 15px;
 }
 
 .key-points {
@@ -319,11 +950,38 @@ section h2 i {
 }
 
 .key-point {
-    background: rgba(255, 255, 255, 0.7);
+    background: rgba(248, 250, 252, 0.95);
     border-radius: 10px;
     padding: 15px;
-    border-left: 4px solid #667eea;
+    border-left: 4px solid #4f46e5;
     font-size: 0.95rem;
+    color: #1f2937;
+    border: 1px solid rgba(79, 70, 229, 0.2);
+    font-weight: 500;
+    box-shadow: 0 2px 8px rgba(79, 70, 229, 0.08);
+    transition: all 0.2s ease;
+}
+
+.key-point:hover {
+    background: rgba(238, 242, 255, 0.98);
+    border-color: rgba(79, 70, 229, 0.3);
+    box-shadow: 0 4px 12px rgba(79, 70, 229, 0.12);
+    transform: translateY(-1px);
+}
+
+/* Dark mode key points - maintain existing dark styling */
+[data-theme="dark"] .key-point {
+    background: rgba(51, 65, 85, 0.8);
+    color: #e2e8f0;
+    border-left: 4px solid #60a5fa;
+    border: 1px solid rgba(148, 163, 184, 0.2);
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.2);
+}
+
+[data-theme="dark"] .key-point:hover {
+    background: rgba(71, 85, 105, 0.9);
+    border-color: rgba(148, 163, 184, 0.3);
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
 }
 
 /* Top Movers */
@@ -355,29 +1013,31 @@ section h2 i {
 }
 
 .stock-item {
-    background: rgba(255, 255, 255, 0.7);
+    background: var(--bg-secondary);
     border-radius: 12px;
     padding: 20px;
     display: flex;
     justify-content: space-between;
     align-items: center;
     transition: transform 0.2s ease;
+    border: 1px solid var(--border-light);
 }
 
 .stock-item:hover {
     transform: translateX(5px);
-    box-shadow: 0 5px 20px rgba(0, 0, 0, 0.1);
+    box-shadow: var(--shadow-light);
 }
 
 .stock-info h4 {
     font-size: 1.1rem;
     font-weight: 600;
     margin-bottom: 4px;
+    color: var(--text-primary);
 }
 
 .stock-price {
     font-size: 1rem;
-    color: #666;
+    color: var(--text-secondary);
 }
 
 .stock-change {
@@ -425,7 +1085,7 @@ section h2 i {
 }
 
 .earnings-item {
-    background: linear-gradient(135deg, #fef3c7, #fed7aa);
+    background: linear-gradient(135deg, #dbeafe, #bfdbfe);
     border-radius: 12px;
     padding: 20px;
     display: flex;
@@ -608,6 +1268,18 @@ section h2 i {
         text-align: center;
     }
     
+    .header-left {
+        gap: 15px;
+        justify-content: center;
+        width: 100%;
+    }
+    
+    .theme-toggle {
+        width: 45px;
+        height: 45px;
+        font-size: 1.1rem;
+    }
+    
     .movers-grid {
         grid-template-columns: 1fr;
     }
@@ -665,7 +1337,11 @@ section h2 i {
 
 /* Company Search Styles */
 .company-search {
-    background: linear-gradient(135deg, #f0f9ff, #e0f2fe);
+    background: var(--bg-card);
+}
+
+.company-search h2 {
+    color: var(--text-summary);
 }
 
 .search-container {
@@ -930,7 +1606,7 @@ section h2 i {
     background: rgba(255, 255, 255, 0.8);
     border-radius: 16px;
     padding: 25px;
-    border-left: 4px solid #f59e0b;
+    border-left: 4px solid #3b82f6;
 }
 
 .ratio-category h3 {
@@ -1369,7 +2045,7 @@ section h2 i {
 }
 
 .risk-medium {
-    color: #f59e0b;
+    color: #3b82f6;
     font-weight: 600;
 }
 
@@ -1419,7 +2095,7 @@ section h2 i {
 
 /* News & Sentiment Styles */
 .news-sentiment {
-    background: linear-gradient(135deg, #fff7ed, #fed7aa);
+    background: linear-gradient(135deg, #eff6ff, #bfdbfe);
 }
 
 .news-filters {
@@ -1475,11 +2151,15 @@ section h2 i {
 }
 
 .stat-number.positive {
-    color: #059669;
+    color: #047857;
+    font-weight: 700;
+    text-shadow: 0 1px 2px rgba(5, 150, 105, 0.2);
 }
 
 .stat-number.negative {
-    color: #dc2626;
+    color: #b91c1c;
+    font-weight: 700;
+    text-shadow: 0 1px 2px rgba(220, 38, 38, 0.2);
 }
 
 .stat-label {
@@ -1494,18 +2174,24 @@ section h2 i {
 }
 
 .sentiment-badge.positive {
-    background: rgba(5, 150, 105, 0.2);
-    color: #059669;
+    background: rgba(5, 150, 105, 0.25);
+    color: #047857;
+    font-weight: 600;
+    border: 1px solid rgba(5, 150, 105, 0.3);
 }
 
 .sentiment-badge.negative {
-    background: rgba(220, 38, 38, 0.2);
-    color: #dc2626;
+    background: rgba(220, 38, 38, 0.25);
+    color: #b91c1c;
+    font-weight: 600;
+    border: 1px solid rgba(220, 38, 38, 0.3);
 }
 
 .sentiment-badge.neutral {
-    background: rgba(107, 114, 128, 0.2);
-    color: #6b7280;
+    background: rgba(107, 114, 128, 0.25);
+    color: #4b5563;
+    font-weight: 600;
+    border: 1px solid rgba(107, 114, 128, 0.3);
 }
 
 .news-list {
@@ -1517,7 +2203,7 @@ section h2 i {
     background: rgba(255, 255, 255, 0.9);
     border-radius: 12px;
     padding: 20px;
-    border-left: 4px solid #f59e0b;
+    border-left: 4px solid #3b82f6;
     transition: transform 0.2s ease;
 }
 
@@ -1606,7 +2292,7 @@ section h2 i {
 .impact-score {
     font-size: 1.3rem;
     font-weight: 700;
-    color: #f59e0b;
+    color: #3b82f6;
 }
 
 /* Sentiment Analysis */
@@ -2171,7 +2857,7 @@ section h2 i {
 }
 
 .warning-box {
-    background: linear-gradient(135deg, #fbbf24, #f59e0b);
+    background: linear-gradient(135deg, #60a5fa, #3b82f6);
     color: white;
     padding: 15px;
     border-radius: 10px;
@@ -2376,7 +3062,7 @@ section h2 i {
 }
 
 .high-volume {
-    border-left: 3px solid #f59e0b;
+    border-left: 3px solid #3b82f6;
 }
 
 .greek-highlight-delta { background: rgba(59, 130, 246, 0.2) !important; }
@@ -2723,7 +3409,7 @@ section h2 i {
 }
 
 .volume-ratio {
-    color: #f59e0b;
+    color: #3b82f6;
 }
 
 .high-volume {
@@ -3201,7 +3887,7 @@ section h2 i {
 }
 
 .btn-edit {
-    background: #f59e0b;
+    background: #3b82f6;
     color: white;
     border: none;
 }
