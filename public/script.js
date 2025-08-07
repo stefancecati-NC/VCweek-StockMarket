@@ -75,9 +75,9 @@ class StockMarketApp {
         const icon = toggleButton.querySelector('i');
         
         if (theme === 'dark') {
-            icon.className = 'fas fa-moon';
-        } else {
             icon.className = 'fas fa-sun';
+        } else {
+            icon.className = 'fas fa-moon';
         }
     }
 
