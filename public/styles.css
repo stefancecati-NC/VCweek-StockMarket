@@ -200,6 +200,63 @@
     border: 1px solid rgba(148, 163, 184, 0.2);
 }
 
+/* Investment simulator form labels - lighter in dark mode */
+[data-theme="dark"] .investment-simulator .form-group label {
+    color: #f1f5f9;
+    font-weight: 500;
+}
+
+/* Investment simulator select options - lighter in dark mode */
+[data-theme="dark"] .investment-simulator .form-group select {
+    background: rgba(51, 65, 85, 0.8);
+    border: 2px solid rgba(148, 163, 184, 0.3);
+    color: #f1f5f9;
+}
+
+[data-theme="dark"] .investment-simulator .form-group select option {
+    background: #334155;
+    color: #f1f5f9;
+}
+
+/* Investment simulator number input arrows - lighter in dark mode */
+[data-theme="dark"] .investment-simulator .form-group input[type="number"]::-webkit-outer-spin-button,
+[data-theme="dark"] .investment-simulator .form-group input[type="number"]::-webkit-inner-spin-button {
+    -webkit-appearance: none;
+    appearance: none;
+    background: rgba(71, 85, 105, 0.8);
+    border-left: 1px solid rgba(148, 163, 184, 0.3);
+    cursor: pointer;
+    display: block;
+    height: 22px;
+    position: relative;
+    right: 2px;
+    width: 16px;
+    border-radius: 0 4px 4px 0;
+}
+
+[data-theme="dark"] .investment-simulator .form-group input[type="number"] {
+    -moz-appearance: textfield;
+    background: rgba(51, 65, 85, 0.8);
+    border: 2px solid rgba(148, 163, 184, 0.3);
+    color: #f1f5f9;
+}
+
+/* Custom arrows for better visibility */
+[data-theme="dark"] .investment-simulator .form-group input[type="number"]::-webkit-inner-spin-button {
+    background-image: 
+        linear-gradient(45deg, transparent 50%, #cbd5e1 50%),
+        linear-gradient(135deg, transparent 50%, #cbd5e1 50%);
+    background-position: 
+        calc(50% - 2px) calc(50% - 1px),
+        calc(50% + 2px) calc(50% - 1px);
+    background-size: 4px 4px;
+    background-repeat: no-repeat;
+}
+
+[data-theme="dark"] .investment-simulator .form-group input[type="number"]::-webkit-inner-spin-button:hover {
+    background-color: rgba(96, 165, 250, 0.2);
+}
+
 /* Search input placeholder - darker in dark mode */
 [data-theme="dark"] .search-container input {
     background: rgba(51, 65, 85, 0.8);
@@ -233,6 +290,10 @@
 }
 
 [data-theme="dark"] .portfolio-management h2 {
+    color: #f1f5f9;
+}
+
+[data-theme="dark"] .portfolio-management h3 {
     color: #f1f5f9;
 }
 
