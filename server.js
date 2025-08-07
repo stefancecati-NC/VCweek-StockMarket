@@ -10,6 +10,7 @@ const fundamentalsService = require('./services/fundamentalsService');
 const newsService = require('./services/newsService');
 const investmentSimulator = require('./services/investmentSimulator');
 const OptionsService = require('./services/optionsService');
+const portfolioService = require('./services/portfolioService');
 
 const optionsService = new OptionsService();
 
@@ -402,6 +403,96 @@ app.get('/api/investment-profiles', (req, res) => {
     } catch (error) {
         console.error('Error fetching investment profiles:', error);
         res.status(500).json({ error: 'Failed to fetch investment profiles' });
+    }
+});
+
+// Portfolio Management API Routes
+app.get('/api/portfolio', async (req, res) => {
+    try {
+        const portfolioId = req.query.portfolioId;
+        const summary = await portfolioService.getPortfolioSummary(portfolioId);
+        res.json(summary);
+    } catch (error) {
+        console.error('Error fetching portfolio:', error);
+        res.status(500).json({ error: 'Failed to fetch portfolio' });
+    }
+});
+
+app.get('/api/portfolio/performance', async (req, res) => {
+    try {
+        const portfolioId = req.query.portfolioId;
+        const performance = await portfolioService.calculatePortfolioPerformance(portfolioId);
+        res.json(performance);
+    } catch (error) {
+        console.error('Error calculating portfolio performance:', error);
+        res.status(500).json({ error: 'Failed to calculate portfolio performance' });
+    }
+});
+
+app.get('/api/portfolio/allocation', async (req, res) => {
+    try {
+        const portfolioId = req.query.portfolioId;
+        const allocation = await portfolioService.calculateAssetAllocation(portfolioId);
+        res.json(allocation);
+    } catch (error) {
+        console.error('Error calculating asset allocation:', error);
+        res.status(500).json({ error: 'Failed to calculate asset allocation' });
+    }
+});
+
+app.post('/api/portfolio/position', async (req, res) => {
+    try {
+        const { position, portfolioId } = req.body;
+        const updatedPortfolio = portfolioService.addPosition(position, portfolioId);
+        res.json(updatedPortfolio);
+    } catch (error) {
+        console.error('Error adding position:', error);
+        res.status(400).json({ error: error.message || 'Failed to add position' });
+    }
+});
+
+app.put('/api/portfolio/position/:positionId', async (req, res) => {
+    try {
+        const { positionId } = req.params;
+        const { updates, portfolioId } = req.body;
+        const updatedPortfolio = portfolioService.updatePosition(positionId, updates, portfolioId);
+        res.json(updatedPortfolio);
+    } catch (error) {
+        console.error('Error updating position:', error);
+        res.status(400).json({ error: error.message || 'Failed to update position' });
+    }
+});
+
+app.delete('/api/portfolio/position/:positionId', async (req, res) => {
+    try {
+        const { positionId } = req.params;
+        const { portfolioId } = req.body;
+        const updatedPortfolio = portfolioService.removePosition(positionId, portfolioId);
+        res.json(updatedPortfolio);
+    } catch (error) {
+        console.error('Error removing position:', error);
+        res.status(400).json({ error: error.message || 'Failed to remove position' });
+    }
+});
+
+app.get('/api/portfolios', async (req, res) => {
+    try {
+        const portfolios = portfolioService.getAllPortfolios();
+        res.json(portfolios);
+    } catch (error) {
+        console.error('Error fetching portfolios:', error);
+        res.status(500).json({ error: 'Failed to fetch portfolios' });
+    }
+});
+
+app.post('/api/portfolio', async (req, res) => {
+    try {
+        const { name } = req.body;
+        const portfolio = portfolioService.createPortfolio(name);
+        res.json(portfolio);
+    } catch (error) {
+        console.error('Error creating portfolio:', error);
+        res.status(400).json({ error: error.message || 'Failed to create portfolio' });
     }
 });
 

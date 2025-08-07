@@ -9,6 +9,7 @@ class StockMarketApp {
         this.bindEventListeners();
         this.loadInitialData();
         this.bindNewEventListeners();
+        this.bindPortfolioEventListeners();
         // Initialize charts after all other data is loaded and DOM is ready
         setTimeout(() => {
             this.initializeCharts();
@@ -55,6 +56,11 @@ class StockMarketApp {
                 this.loadEarningsCalendar(),
                 this.loadStrategyTemplates()
             ]);
+            
+            // Load portfolio data after other elements are loaded
+            setTimeout(() => {
+                this.loadPortfolioData();
+            }, 500);
             this.updateLastUpdatedTime();
         } catch (error) {
             this.showError('Failed to load initial data. Please check your connection and try again.');
@@ -2677,9 +2683,345 @@ class StockMarketApp {
             </div>
         `;
     }
+
+    // Portfolio Management Methods
+    bindPortfolioEventListeners() {
+        // Add position button
+        document.getElementById('addPositionBtn')?.addEventListener('click', () => {
+            this.showAddPositionForm();
+        });
+
+        // Refresh portfolio button
+        document.getElementById('refreshPortfolioBtn')?.addEventListener('click', () => {
+            this.refreshPortfolio();
+        });
+
+        // Save position button
+        document.getElementById('savePositionBtn')?.addEventListener('click', () => {
+            this.savePosition();
+        });
+
+        // Cancel position button
+        document.getElementById('cancelPositionBtn')?.addEventListener('click', () => {
+            this.hideAddPositionForm();
+        });
+    }
+
+    async loadPortfolioData() {
+        try {
+            const data = await this.apiCall('GET', '/portfolio');
+            
+            if (data && data.performance) {
+                this.renderPortfolioOverview(data.performance);
+                this.renderPortfolioPositions(data.performance.positions);
+                this.renderAllocationCharts(data.allocation);
+            } else {
+                this.showEmptyPortfolio();
+            }
+        } catch (error) {
+            console.error('Error loading portfolio:', error);
+            this.showEmptyPortfolio();
+        }
+    }
+
+    async refreshPortfolio() {
+        const refreshBtn = document.getElementById('refreshPortfolioBtn');
+        const icon = refreshBtn.querySelector('i');
+        
+        // Add spinning animation
+        icon.classList.add('fa-spin');
+        refreshBtn.disabled = true;
+
+        try {
+            await this.loadPortfolioData();
+            this.showToast('Portfolio refreshed successfully!');
+        } catch (error) {
+            this.showError('Failed to refresh portfolio. Please try again.');
+        } finally {
+            icon.classList.remove('fa-spin');
+            refreshBtn.disabled = false;
+        }
+    }
+
+    showAddPositionForm() {
+        const form = document.getElementById('addPositionForm');
+        form.style.display = 'block';
+        
+        // Set today's date as default
+        const today = new Date().toISOString().split('T')[0];
+        document.getElementById('positionDate').value = today;
+        
+        // Clear form
+        this.clearPositionForm();
+    }
+
+    hideAddPositionForm() {
+        const form = document.getElementById('addPositionForm');
+        form.style.display = 'none';
+        this.clearPositionForm();
+    }
+
+    clearPositionForm() {
+        document.getElementById('positionSymbol').value = '';
+        document.getElementById('positionQuantity').value = '';
+        document.getElementById('positionPrice').value = '';
+        document.getElementById('positionAssetType').value = 'Stock';
+    }
+
+    async savePosition() {
+        const symbol = document.getElementById('positionSymbol').value.trim().toUpperCase();
+        const quantity = parseFloat(document.getElementById('positionQuantity').value);
+        const price = parseFloat(document.getElementById('positionPrice').value);
+        const date = document.getElementById('positionDate').value;
+        const assetType = document.getElementById('positionAssetType').value;
+
+        // Validation
+        if (!symbol || !quantity || !price) {
+            this.showError('Please fill in all required fields (Symbol, Quantity, Purchase Price).');
+            return;
+        }
+
+        if (quantity <= 0 || price <= 0) {
+            this.showError('Quantity and price must be greater than zero.');
+            return;
+        }
+
+        try {
+            const position = {
+                symbol,
+                quantity,
+                purchasePrice: price,
+                purchaseDate: date,
+                assetType
+            };
+
+            await this.apiCall('POST', '/portfolio/position', { position });
+            this.hideAddPositionForm();
+            this.loadPortfolioData();
+            this.showToast(`Successfully added ${quantity} shares of ${symbol}!`);
+        } catch (error) {
+            this.showError('Failed to add position. Please try again.');
+        }
+    }
+
+    async removePosition(positionId, symbol) {
+        if (!confirm(`Are you sure you want to remove ${symbol} from your portfolio?`)) {
+            return;
+        }
+
+        try {
+            await this.apiCall('DELETE', `/portfolio/position/${positionId}`, {});
+            this.loadPortfolioData();
+            this.showToast(`Successfully removed ${symbol} from portfolio!`);
+        } catch (error) {
+            this.showError('Failed to remove position. Please try again.');
+        }
+    }
+
+    renderPortfolioOverview(performance) {
+        // Update stats
+        document.getElementById('totalValue').textContent = this.formatCurrency(performance.totalValue);
+        document.getElementById('totalCost').textContent = this.formatCurrency(performance.totalCost);
+        document.getElementById('totalPnL').textContent = this.formatCurrency(performance.totalGainLoss);
+        document.getElementById('positionsCount').textContent = performance.positions.length;
+
+        // Update P&L percentage with styling
+        const pnlPercent = document.getElementById('totalPnLPercent');
+        const percentValue = performance.totalGainLossPercent;
+        pnlPercent.textContent = `${percentValue >= 0 ? '+' : ''}${percentValue.toFixed(2)}%`;
+        
+        // Apply styling based on performance
+        pnlPercent.className = 'stat-change';
+        if (percentValue > 0) {
+            pnlPercent.classList.add('positive');
+        } else if (percentValue < 0) {
+            pnlPercent.classList.add('negative');
+        } else {
+            pnlPercent.classList.add('neutral');
+        }
+    }
+
+    renderPortfolioPositions(positions) {
+        const tableBody = document.getElementById('positionsTableBody');
+        const emptyPortfolio = document.getElementById('emptyPortfolio');
+        const positionsTable = document.getElementById('positionsTable');
+
+        if (!positions || positions.length === 0) {
+            this.showEmptyPortfolio();
+            return;
+        }
+
+        // Hide empty state and show table
+        emptyPortfolio.style.display = 'none';
+        positionsTable.style.display = 'block';
+
+        tableBody.innerHTML = positions.map(position => `
+            <div class="position-row">
+                <div class="position-symbol">${position.symbol}</div>
+                <div class="position-quantity">${this.formatNumber(position.quantity)}</div>
+                <div class="position-price">$${position.purchasePrice.toFixed(2)}</div>
+                <div class="position-current">$${position.currentPrice.toFixed(2)}</div>
+                <div class="position-value">$${this.formatNumber(position.marketValue)}</div>
+                <div class="position-pnl ${this.getPnLClass(position.gainLoss)}">
+                    $${this.formatNumber(position.gainLoss)}
+                    <br>
+                    <small>(${position.gainLossPercent >= 0 ? '+' : ''}${position.gainLossPercent.toFixed(2)}%)</small>
+                </div>
+                <div class="position-weight">${position.weight.toFixed(1)}%</div>
+                <div class="position-actions">
+                    <button class="btn-remove" onclick="app.removePosition('${position.id}', '${position.symbol}')">
+                        <i class="fas fa-trash"></i>
+                    </button>
+                </div>
+            </div>
+        `).join('');
+    }
+
+    showEmptyPortfolio() {
+        const emptyPortfolio = document.getElementById('emptyPortfolio');
+        const positionsTable = document.getElementById('positionsTable');
+        const allocationCharts = document.getElementById('allocationCharts');
+        
+        emptyPortfolio.style.display = 'block';
+        positionsTable.style.display = 'none';
+        allocationCharts.style.display = 'none';
+
+        // Reset stats
+        document.getElementById('totalValue').textContent = '$0.00';
+        document.getElementById('totalCost').textContent = '$0.00';
+        document.getElementById('totalPnL').textContent = '$0.00';
+        document.getElementById('totalPnLPercent').textContent = '0.00%';
+        document.getElementById('positionsCount').textContent = '0';
+    }
+
+    renderAllocationCharts(allocation) {
+        if (!allocation || Object.keys(allocation.bySector).length === 0) {
+            document.getElementById('allocationCharts').style.display = 'none';
+            return;
+        }
+
+        document.getElementById('allocationCharts').style.display = 'block';
+
+        // Render sector allocation chart
+        this.renderPieChart('sectorAllocationChart', allocation.bySector, 'Sector Allocation');
+        
+        // Render asset type allocation chart
+        this.renderPieChart('typeAllocationChart', allocation.byAssetType, 'Asset Type Allocation');
+    }
+
+    renderPieChart(canvasId, data, title) {
+        const canvas = document.getElementById(canvasId);
+        const ctx = canvas.getContext('2d');
+
+        // Destroy existing chart if it exists
+        if (canvas.chart) {
+            canvas.chart.destroy();
+        }
+
+        const labels = Object.keys(data);
+        const values = labels.map(label => data[label].weight);
+        const colors = this.generateColors(labels.length);
+
+        canvas.chart = new Chart(ctx, {
+            type: 'pie',
+            data: {
+                labels: labels,
+                datasets: [{
+                    data: values,
+                    backgroundColor: colors,
+                    borderColor: colors.map(color => color.replace('0.8', '1')),
+                    borderWidth: 2
+                }]
+            },
+            options: {
+                responsive: true,
+                maintainAspectRatio: true,
+                aspectRatio: 1,
+                layout: {
+                    padding: 20
+                },
+                plugins: {
+                    legend: {
+                        position: 'bottom',
+                        labels: {
+                            padding: 15,
+                            usePointStyle: true,
+                            font: {
+                                size: 11
+                            },
+                            boxWidth: 12,
+                            boxHeight: 12
+                        }
+                    },
+                    tooltip: {
+                        callbacks: {
+                            label: function(context) {
+                                const label = context.label || '';
+                                const value = context.parsed || 0;
+                                return `${label}: ${value.toFixed(1)}%`;
+                            }
+                        }
+                    }
+                },
+                elements: {
+                    arc: {
+                        borderWidth: 2
+                    }
+                }
+            }
+        });
+    }
+
+    generateColors(count) {
+        const colors = [
+            'rgba(102, 126, 234, 0.8)',
+            'rgba(16, 185, 129, 0.8)',
+            'rgba(245, 158, 11, 0.8)',
+            'rgba(239, 68, 68, 0.8)',
+            'rgba(139, 92, 246, 0.8)',
+            'rgba(236, 72, 153, 0.8)',
+            'rgba(6, 182, 212, 0.8)',
+            'rgba(34, 197, 94, 0.8)',
+            'rgba(251, 146, 60, 0.8)',
+            'rgba(168, 85, 247, 0.8)'
+        ];
+
+        // If we need more colors than predefined, generate them
+        while (colors.length < count) {
+            const hue = (colors.length * 137.508) % 360; // Golden angle approximation
+            colors.push(`hsla(${hue}, 70%, 60%, 0.8)`);
+        }
+
+        return colors.slice(0, count);
+    }
+
+    getPnLClass(value) {
+        if (value > 0) return 'positive';
+        if (value < 0) return 'negative';
+        return 'neutral';
+    }
+
+    formatNumber(num) {
+        if (Math.abs(num) >= 1000000) {
+            return (num / 1000000).toFixed(1) + 'M';
+        } else if (Math.abs(num) >= 1000) {
+            return (num / 1000).toFixed(1) + 'K';
+        }
+        return num.toFixed(2);
+    }
+
+    formatCurrency(amount) {
+        return new Intl.NumberFormat('en-US', {
+            style: 'currency',
+            currency: 'USD',
+            minimumFractionDigits: 2,
+            maximumFractionDigits: 2
+        }).format(amount);
+    }
 }
 
 // Initialize the app when the DOM is loaded
+let app; // Global reference for onclick handlers
 document.addEventListener('DOMContentLoaded', () => {
-    new StockMarketApp();
+    app = new StockMarketApp();
 });
