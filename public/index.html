@@ -735,6 +735,125 @@
             </div>
         </section>
 
+        <!-- Portfolio Management -->
+        <section class="portfolio-management">
+            <h2><i class="fas fa-briefcase"></i> Portfolio Management</h2>
+            
+            <!-- Portfolio Overview -->
+            <div class="portfolio-overview">
+                <div class="portfolio-stats" id="portfolioStats">
+                    <div class="stat-card">
+                        <h3>Total Value</h3>
+                        <div class="stat-value" id="totalValue">$0.00</div>
+                    </div>
+                    <div class="stat-card">
+                        <h3>Total Cost</h3>
+                        <div class="stat-value" id="totalCost">$0.00</div>
+                    </div>
+                    <div class="stat-card">
+                        <h3>Total P&L</h3>
+                        <div class="stat-value" id="totalPnL">$0.00</div>
+                        <div class="stat-change" id="totalPnLPercent">0.00%</div>
+                    </div>
+                    <div class="stat-card">
+                        <h3>Positions</h3>
+                        <div class="stat-value" id="positionsCount">0</div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Portfolio Actions -->
+            <div class="portfolio-actions">
+                <button id="addPositionBtn" class="btn btn-primary">
+                    <i class="fas fa-plus"></i> Add Position
+                </button>
+                <button id="refreshPortfolioBtn" class="btn btn-secondary">
+                    <i class="fas fa-sync-alt"></i> Refresh
+                </button>
+            </div>
+
+            <!-- Add Position Form -->
+            <div class="add-position-form" id="addPositionForm" style="display: none;">
+                <h3>Add New Position</h3>
+                <div class="form-grid">
+                    <div class="form-group">
+                        <label for="positionSymbol">Symbol</label>
+                        <input type="text" id="positionSymbol" placeholder="AAPL" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="positionQuantity">Quantity</label>
+                        <input type="number" id="positionQuantity" placeholder="10" min="0.001" step="0.001" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="positionPrice">Purchase Price</label>
+                        <input type="number" id="positionPrice" placeholder="150.00" min="0.01" step="0.01" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="positionDate">Purchase Date</label>
+                        <input type="date" id="positionDate">
+                    </div>
+                    <div class="form-group">
+                        <label for="positionAssetType">Asset Type</label>
+                        <select id="positionAssetType">
+                            <option value="Stock">Stock</option>
+                            <option value="ETF">ETF</option>
+                            <option value="Technology">Technology</option>
+                            <option value="Consumer Discretionary">Consumer Discretionary</option>
+                            <option value="Healthcare">Healthcare</option>
+                            <option value="Financial">Financial</option>
+                        </select>
+                    </div>
+                </div>
+                <div class="form-actions">
+                    <button id="savePositionBtn" class="btn btn-primary">
+                        <i class="fas fa-save"></i> Add Position
+                    </button>
+                    <button id="cancelPositionBtn" class="btn btn-secondary">Cancel</button>
+                </div>
+            </div>
+
+            <!-- Portfolio Positions -->
+            <div class="portfolio-positions">
+                <h3>Current Positions</h3>
+                <div class="positions-table" id="positionsTable">
+                    <div class="table-header">
+                        <div class="col-symbol">Symbol</div>
+                        <div class="col-quantity">Quantity</div>
+                        <div class="col-price">Purchase Price</div>
+                        <div class="col-current">Current Price</div>
+                        <div class="col-value">Market Value</div>
+                        <div class="col-pnl">P&L</div>
+                        <div class="col-weight">Weight</div>
+                        <div class="col-actions">Actions</div>
+                    </div>
+                    <div class="table-body" id="positionsTableBody">
+                        <!-- Positions will be populated here -->
+                    </div>
+                </div>
+                <div class="empty-portfolio" id="emptyPortfolio" style="display: none;">
+                    <i class="fas fa-chart-pie fa-3x"></i>
+                    <h3>Your portfolio is empty</h3>
+                    <p>Add your first position to start tracking your investments</p>
+                </div>
+            </div>
+
+            <!-- Asset Allocation Charts -->
+            <div class="allocation-charts" id="allocationCharts" style="display: none;">
+                <div class="chart-container">
+                    <h3>Asset Allocation by Sector</h3>
+                    <div class="chart-wrapper">
+                        <canvas id="sectorAllocationChart"></canvas>
+                    </div>
+                </div>
+                <div class="chart-container">
+                    <h3>Asset Allocation by Type</h3>
+                    <div class="chart-wrapper">
+                        <canvas id="typeAllocationChart"></canvas>
+                    </div>
+                </div>
+            </div>
+        </section>
+
         <!-- Footer -->
         <footer class="footer">
             <p>&copy; 2024 Daily Stock Market Summary. Data for educational purposes only.</p>
