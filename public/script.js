@@ -1573,7 +1573,7 @@ class StockMarketApp {
         } else if (total > 100) {
             totalElement.style.color = '#ef4444'; // Red
         } else {
-            totalElement.style.color = '#f59e0b'; // Orange
+                            totalElement.style.color = '#3b82f6'; // Blue
         }
     }
 

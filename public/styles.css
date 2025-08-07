@@ -219,7 +219,7 @@
 /* News articles in sentiment section - darker in dark mode */
 [data-theme="dark"] .news-article {
     background: rgba(51, 65, 85, 0.8);
-    border-left: 4px solid #f59e0b;
+    border-left: 4px solid #3b82f6;
 }
 
 [data-theme="dark"] .news-article:hover {
@@ -961,7 +961,7 @@ section h2 i {
 }
 
 .earnings-item {
-    background: linear-gradient(135deg, #fef3c7, #fed7aa);
+    background: linear-gradient(135deg, #dbeafe, #bfdbfe);
     border-radius: 12px;
     padding: 20px;
     display: flex;
@@ -1482,7 +1482,7 @@ section h2 i {
     background: rgba(255, 255, 255, 0.8);
     border-radius: 16px;
     padding: 25px;
-    border-left: 4px solid #f59e0b;
+    border-left: 4px solid #3b82f6;
 }
 
 .ratio-category h3 {
@@ -1921,7 +1921,7 @@ section h2 i {
 }
 
 .risk-medium {
-    color: #f59e0b;
+    color: #3b82f6;
     font-weight: 600;
 }
 
@@ -1971,7 +1971,7 @@ section h2 i {
 
 /* News & Sentiment Styles */
 .news-sentiment {
-    background: linear-gradient(135deg, #fff7ed, #fed7aa);
+    background: linear-gradient(135deg, #eff6ff, #bfdbfe);
 }
 
 .news-filters {
@@ -2079,7 +2079,7 @@ section h2 i {
     background: rgba(255, 255, 255, 0.9);
     border-radius: 12px;
     padding: 20px;
-    border-left: 4px solid #f59e0b;
+    border-left: 4px solid #3b82f6;
     transition: transform 0.2s ease;
 }
 
@@ -2168,7 +2168,7 @@ section h2 i {
 .impact-score {
     font-size: 1.3rem;
     font-weight: 700;
-    color: #f59e0b;
+    color: #3b82f6;
 }
 
 /* Sentiment Analysis */
@@ -2733,7 +2733,7 @@ section h2 i {
 }
 
 .warning-box {
-    background: linear-gradient(135deg, #fbbf24, #f59e0b);
+    background: linear-gradient(135deg, #60a5fa, #3b82f6);
     color: white;
     padding: 15px;
     border-radius: 10px;
@@ -2938,7 +2938,7 @@ section h2 i {
 }
 
 .high-volume {
-    border-left: 3px solid #f59e0b;
+    border-left: 3px solid #3b82f6;
 }
 
 .greek-highlight-delta { background: rgba(59, 130, 246, 0.2) !important; }
@@ -3285,7 +3285,7 @@ section h2 i {
 }
 
 .volume-ratio {
-    color: #f59e0b;
+    color: #3b82f6;
 }
 
 .high-volume {
@@ -3763,7 +3763,7 @@ section h2 i {
 }
 
 .btn-edit {
-    background: #f59e0b;
+    background: #3b82f6;
     color: white;
     border: none;
 }
