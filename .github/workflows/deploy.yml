@@ -2,9 +2,9 @@ name: Deploy to GitHub Pages
 
 on:
   push:
-    branches: [ main ]
+    branches: [ main, cleanup-and-deploy ]
   pull_request:
-    branches: [ main ]
+    branches: [ main, cleanup-and-deploy ]
 
 permissions:
   contents: read
