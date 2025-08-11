@@ -2,7 +2,90 @@ class StockMarketApp {
     constructor() {
         this.apiBaseUrl = '/api';
         this.isLoading = false;
+        this.useMockData = true; // Enable mock data for deployed version
         this.init();
+    }
+
+    // Mock data for demo purposes
+    getMockData() {
+        return {
+            dailySummary: {
+                summary: "Today's market showed mixed signals with technology stocks leading gains while energy sectors faced headwinds. The S&P 500 closed up 0.8% driven by strong earnings from major tech companies. Investors are closely watching Federal Reserve policy signals and inflation data. Key highlights include Apple's strong iPhone sales, Microsoft's cloud growth, and Tesla's production updates.",
+                sentiment: "Bullish",
+                keyPoints: [
+                    "Tech stocks surge on strong earnings reports",
+                    "Fed policy decisions remain market focus",
+                    "Energy sector faces continued pressure",
+                    "Consumer spending shows resilience"
+                ]
+            },
+            marketData: {
+                indices: [
+                    { name: "S&P 500", symbol: "SPX", price: 4456.24, change: 35.87, changePercent: 0.81 },
+                    { name: "Dow Jones", symbol: "DJI", price: 34589.77, change: 145.30, changePercent: 0.42 },
+                    { name: "NASDAQ", symbol: "IXIC", price: 13518.33, change: 180.66, changePercent: 1.35 },
+                    { name: "Russell 2000", symbol: "RUT", price: 1978.55, change: -8.23, changePercent: -0.41 }
+                ],
+                topMovers: [
+                    { symbol: "AAPL", name: "Apple Inc.", price: 178.25, change: 8.45, changePercent: 4.98 },
+                    { symbol: "MSFT", name: "Microsoft Corp.", price: 334.88, change: 12.33, changePercent: 3.82 },
+                    { symbol: "TSLA", name: "Tesla Inc.", price: 248.50, change: -15.25, changePercent: -5.78 },
+                    { symbol: "NVDA", name: "NVIDIA Corp.", price: 445.67, change: 22.18, changePercent: 5.24 }
+                ],
+                majorStocks: [
+                    { symbol: "GOOGL", name: "Alphabet Inc.", price: 138.45, change: 2.87, changePercent: 2.12 },
+                    { symbol: "AMZN", name: "Amazon.com Inc.", price: 144.78, change: -1.23, changePercent: -0.84 },
+                    { symbol: "META", name: "Meta Platforms", price: 308.25, change: 5.67, changePercent: 1.87 },
+                    { symbol: "NFLX", name: "Netflix Inc.", price: 425.89, change: 8.91, changePercent: 2.14 }
+                ]
+            },
+            earningsCalendar: [
+                { 
+                    symbol: "AAPL", 
+                    company: "Apple Inc.", 
+                    date: "2025-08-15", 
+                    time: "after-market",
+                    expectedEPS: 1.35,
+                    estimatedRevenue: "81.5B"
+                },
+                { 
+                    symbol: "MSFT", 
+                    company: "Microsoft Corp.", 
+                    date: "2025-08-16", 
+                    time: "after-market",
+                    expectedEPS: 2.45,
+                    estimatedRevenue: "52.8B"
+                },
+                { 
+                    symbol: "GOOGL", 
+                    company: "Alphabet Inc.", 
+                    date: "2025-08-17", 
+                    time: "after-market",
+                    expectedEPS: 1.78,
+                    estimatedRevenue: "74.2B"
+                }
+            ],
+            optionsStrategies: [
+                {
+                    name: "Covered Call",
+                    description: "Generate income from existing stock positions",
+                    riskLevel: "Low",
+                    market: "Neutral to Slightly Bullish"
+                },
+                {
+                    name: "Protective Put",
+                    description: "Hedge existing stock positions against downside",
+                    riskLevel: "Low",
+                    market: "Bullish with Downside Protection"
+                },
+                {
+                    name: "Iron Condor",
+                    description: "Profit from low volatility in sideways markets",
+                    riskLevel: "Medium",
+                    market: "Neutral"
+                }
+            ]
+        };
     }
 
     init() {
@@ -165,6 +248,11 @@ class StockMarketApp {
     }
 
     async apiCall(method, endpoint, body = null) {
+        // If using mock data or API is not available, return mock data
+        if (this.useMockData) {
+            return this.getMockDataForEndpoint(endpoint);
+        }
+
         const options = {
             method: method,
             headers: {
@@ -176,13 +264,36 @@ class StockMarketApp {
             options.body = JSON.stringify(body);
         }
 
-        const response = await fetch(`${this.apiBaseUrl}${endpoint}`, options);
-        
-        if (!response.ok) {
-            throw new Error(`HTTP error! status: ${response.status}`);
+        try {
+            const response = await fetch(`${this.apiBaseUrl}${endpoint}`, options);
+            
+            if (!response.ok) {
+                throw new Error(`HTTP error! status: ${response.status}`);
+            }
+            
+            return await response.json();
+        } catch (error) {
+            console.log('API not available, using mock data for demo');
+            // Fallback to mock data if API fails
+            return this.getMockDataForEndpoint(endpoint);
         }
+    }
+
+    getMockDataForEndpoint(endpoint) {
+        const mockData = this.getMockData();
         
-        return await response.json();
+        switch (true) {
+            case endpoint.includes('/daily-summary'):
+                return mockData.dailySummary;
+            case endpoint.includes('/market-data'):
+                return mockData.marketData;
+            case endpoint.includes('/earnings-calendar'):
+                return mockData.earningsCalendar;
+            case endpoint.includes('/options-strategies'):
+                return mockData.optionsStrategies;
+            default:
+                return { message: 'Mock data not available for this endpoint' };
+        }
     }
 
     renderDailySummary(data) {
@@ -374,7 +485,14 @@ class StockMarketApp {
             minute: '2-digit',
             second: '2-digit'
         });
-        document.getElementById('lastUpdated').textContent = `Last updated: ${timeString}`;
+        
+        if (this.useMockData) {
+            document.getElementById('lastUpdated').innerHTML = `
+                <span style="color: #ff9500;">📊 Demo Data</span> - Last updated: ${timeString}
+            `;
+        } else {
+            document.getElementById('lastUpdated').textContent = `Last updated: ${timeString}`;
+        }
     }
 
     showLoading(show) {
