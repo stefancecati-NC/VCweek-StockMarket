@@ -19,12 +19,26 @@ const PORT = process.env.PORT || 3000;
 
 // Middleware - Configure CORS for production
 const corsOptions = {
-    origin: [
-        'http://localhost:3000',
-        'http://127.0.0.1:3000',
-        'https://stefancecati-NC.github.io',
-        'https://stefancecati-nc.github.io' // GitHub Pages URL (case variations)
-    ],
+    origin: function (origin, callback) {
+        // Allow requests with no origin (like mobile apps or curl requests)
+        if (!origin) return callback(null, true);
+        
+        const allowedOrigins = [
+            'http://localhost:3000',
+            'http://127.0.0.1:3000',
+            'https://stefancecati-NC.github.io',
+            'https://stefancecati-nc.github.io'
+        ];
+        
+        // Check if origin contains github.io (for any case variations)
+        if (origin.includes('github.io') || allowedOrigins.includes(origin)) {
+            console.log('CORS: Allowing origin:', origin);
+            return callback(null, true);
+        }
+        
+        console.log('CORS: Blocking origin:', origin);
+        callback(new Error('Not allowed by CORS'));
+    },
     credentials: true,
     optionsSuccessStatus: 200
 };
