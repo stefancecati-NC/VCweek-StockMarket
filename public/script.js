@@ -7,11 +7,16 @@ class StockMarketApp {
     }
 
     getApiBaseUrl() {
-        // Check if we're on GitHub Pages
-        if (window.location.hostname === 'stefancecati-nc.github.io') {
-            // Your deployed backend URL on Render
+        // Check if we're on GitHub Pages (case insensitive)
+        const hostname = window.location.hostname.toLowerCase();
+        console.log('Current hostname:', hostname); // Debug log
+        
+        if (hostname.includes('github.io')) {
+            console.log('Using Render backend for GitHub Pages');
+            // Your live backend on Render
             return 'https://vcweek-stockmarket.onrender.com/api';
         } else {
+            console.log('Using local backend for development');
             // Local development
             return '/api';
         }
@@ -188,13 +193,23 @@ class StockMarketApp {
             options.body = JSON.stringify(body);
         }
 
-        const response = await fetch(`${this.apiBaseUrl}${endpoint}`, options);
-        
-        if (!response.ok) {
-            throw new Error(`HTTP error! status: ${response.status}`);
+        const fullUrl = `${this.apiBaseUrl}${endpoint}`;
+        console.log(`Making API call: ${method} ${fullUrl}`); // Debug log
+
+        try {
+            const response = await fetch(fullUrl, options);
+            
+            if (!response.ok) {
+                throw new Error(`HTTP error! status: ${response.status}`);
+            }
+            
+            const data = await response.json();
+            console.log(`API response for ${endpoint}:`, data); // Debug log
+            return data;
+        } catch (error) {
+            console.error(`API call failed for ${endpoint}:`, error);
+            throw error;
         }
-        
-        return await response.json();
     }
 
     renderDailySummary(data) {
