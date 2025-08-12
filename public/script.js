@@ -9,8 +9,8 @@ class StockMarketApp {
     getApiBaseUrl() {
         // Check if we're on GitHub Pages
         if (window.location.hostname === 'stefancecati-nc.github.io') {
-            // Replace this with your deployed backend URL (we'll set this up next)
-            return 'https://your-backend-app.onrender.com/api';
+            // Your deployed backend URL on Render
+            return 'https://vcweek-stockmarket.onrender.com/api';
         } else {
             // Local development
             return '/api';
